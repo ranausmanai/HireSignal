@@ -1,11 +1,13 @@
 """Interview Insights — Visual Feedback Analyzer for Engineering Hiring Teams."""
 
 import csv
+import glob
 import io
 import json
 import math
 import os
 import re
+import time
 from collections import Counter, defaultdict
 from datetime import datetime
 
@@ -318,6 +320,12 @@ def compute_analytics(data):
         score_dist = Counter(scores)
         score_distribution = {str(i): score_dist.get(i, 0) for i in range(1, 6)}
 
+        # Theme frequencies for this interviewer
+        interviewer_themes = []
+        for e in entries:
+            interviewer_themes.extend(e.get("themes", []))
+        theme_freq = dict(Counter(interviewer_themes))
+
         per_interviewer[name] = {
             "total": len(entries),
             "pass_rate": pass_rate,
@@ -326,6 +334,7 @@ def compute_analytics(data):
             "score_distribution": score_distribution,
             "decisions": dict(Counter(decisions)),
             "roles": dict(Counter(e["role"] for e in entries)),
+            "themes": theme_freq,
         }
 
     # Per-role stats
@@ -336,10 +345,26 @@ def compute_analytics(data):
     per_role = {}
     for role, entries in role_data.items():
         decisions = Counter(e["decision"] for e in entries)
+        hires = sum(1 for e in entries if e["decision"] in ("hire", "strong_hire"))
+        pass_rate = round(hires / len(entries) * 100, 1) if entries else 0
+        # Per-interviewer stats for this role
+        role_interviewers = defaultdict(list)
+        for e in entries:
+            role_interviewers[e["interviewer"]].append(e)
+        interviewer_stats = {}
+        for iname, ientries in role_interviewers.items():
+            ihires = sum(1 for e in ientries if e["decision"] in ("hire", "strong_hire"))
+            interviewer_stats[iname] = {
+                "total": len(ientries),
+                "pass_rate": round(ihires / len(ientries) * 100, 1) if ientries else 0,
+                "avg_score": round(sum(e["score"] for e in ientries) / len(ientries), 2),
+            }
         per_role[role] = {
             "total": len(entries),
             "decisions": dict(decisions),
             "avg_score": round(sum(e["score"] for e in entries) / len(entries), 2),
+            "pass_rate": pass_rate,
+            "interviewers": interviewer_stats,
         }
 
     # Per-interviewer per-role pass rates (for calibration heatmap)
@@ -580,6 +605,7 @@ def upload():
         feedback_store.extend(entries)
         added += len(entries)
 
+    auto_save()
     return jsonify({"added": added, "total": len(feedback_store)})
 
 
@@ -593,6 +619,7 @@ def paste():
     entries = parse_file("paste.txt", text)
     assign_ids(entries)
     feedback_store.extend(entries)
+    auto_save()
     return jsonify({"added": len(entries), "total": len(feedback_store)})
 
 
@@ -603,7 +630,127 @@ def reset():
     return jsonify({"status": "reset", "total": len(feedback_store)})
 
 
+# --- Session Persistence ---
+
+SESSIONS_DIR = os.path.join(os.path.dirname(__file__), "data", "sessions")
+
+
+def ensure_sessions_dir():
+    os.makedirs(SESSIONS_DIR, exist_ok=True)
+
+
+def auto_save():
+    """Auto-save current feedback store after data changes."""
+    ensure_sessions_dir()
+    filename = f"session_{int(time.time())}.json"
+    filepath = os.path.join(SESSIONS_DIR, filename)
+    with open(filepath, "w") as f:
+        json.dump(feedback_store, f)
+
+
+@app.route("/api/save", methods=["POST"])
+def save_session():
+    ensure_sessions_dir()
+    filename = f"session_{int(time.time())}.json"
+    filepath = os.path.join(SESSIONS_DIR, filename)
+    with open(filepath, "w") as f:
+        json.dump(feedback_store, f)
+    return jsonify({"status": "saved", "filename": filename, "entries": len(feedback_store)})
+
+
+@app.route("/api/sessions")
+def list_sessions():
+    ensure_sessions_dir()
+    sessions = []
+    for filepath in sorted(glob.glob(os.path.join(SESSIONS_DIR, "session_*.json")), reverse=True):
+        fname = os.path.basename(filepath)
+        try:
+            with open(filepath, "r") as f:
+                data = json.load(f)
+            # Extract timestamp from filename
+            ts_str = fname.replace("session_", "").replace(".json", "")
+            ts = int(ts_str)
+            sessions.append({
+                "filename": fname,
+                "entries": len(data),
+                "date": datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S"),
+                "timestamp": ts,
+            })
+        except (json.JSONDecodeError, ValueError, OSError):
+            continue
+    return jsonify(sessions)
+
+
+@app.route("/api/sessions/load", methods=["POST"])
+def load_session():
+    global feedback_store
+    body = request.get_json(silent=True) or {}
+    filename = body.get("filename", "")
+    if not filename or ".." in filename or "/" in filename:
+        return jsonify({"error": "Invalid filename"}), 400
+    filepath = os.path.join(SESSIONS_DIR, filename)
+    if not os.path.exists(filepath):
+        return jsonify({"error": "Session not found"}), 404
+    with open(filepath, "r") as f:
+        feedback_store = json.load(f)
+    return jsonify({"status": "loaded", "total": len(feedback_store)})
+
+
+@app.route("/api/sessions/<filename>", methods=["DELETE"])
+def delete_session(filename):
+    if not filename or ".." in filename or "/" in filename:
+        return jsonify({"error": "Invalid filename"}), 400
+    filepath = os.path.join(SESSIONS_DIR, filename)
+    if not os.path.exists(filepath):
+        return jsonify({"error": "Session not found"}), 404
+    os.remove(filepath)
+    return jsonify({"status": "deleted"})
+
+
+@app.route("/api/sessions", methods=["DELETE"])
+def delete_all_sessions():
+    ensure_sessions_dir()
+    for filepath in glob.glob(os.path.join(SESSIONS_DIR, "session_*.json")):
+        os.remove(filepath)
+    return jsonify({"status": "all_deleted"})
+
+
+@app.route("/api/clear", methods=["DELETE"])
+def clear_data():
+    global feedback_store
+    feedback_store = load_sample_data()
+    return jsonify({"status": "cleared", "total": len(feedback_store)})
+
+
+# --- Interviewer & Role Detail Endpoints ---
+
+@app.route("/api/interviewer/<name>")
+def get_interviewer(name):
+    entries = [e for e in feedback_store if e["interviewer"] == name]
+    if not entries:
+        return jsonify({"error": "Interviewer not found"}), 404
+    analytics = compute_analytics(entries)
+    stats = analytics["per_interviewer"].get(name, {})
+    stats["entries"] = entries
+    stats["name"] = name
+    return jsonify(stats)
+
+
+@app.route("/api/role/<name>")
+def get_role(name):
+    entries = [e for e in feedback_store if e["role"] == name]
+    if not entries:
+        return jsonify({"error": "Role not found"}), 404
+    analytics = compute_analytics(entries)
+    role_stats = analytics["per_role"].get(name, {})
+    role_stats["entries"] = entries
+    role_stats["name"] = name
+    role_stats["per_interviewer"] = analytics["per_interviewer"]
+    return jsonify(role_stats)
+
+
 if __name__ == "__main__":
+    ensure_sessions_dir()
     feedback_store = load_sample_data()
     print(f"Loaded {len(feedback_store)} sample feedback entries")
     print("Starting Interview Insights on http://localhost:8000")

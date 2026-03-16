@@ -410,6 +410,203 @@ function renderWordCloud(containerId, data) {
   });
 }
 
+// --- Comparison: Mirrored Pass Rate Bar ---
+function renderComparisonPassRate(canvasId, dataA, dataB, nameA, nameB) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  // Get all roles from both interviewers
+  const allRoles = [...new Set([
+    ...Object.keys(dataA.roles || {}),
+    ...Object.keys(dataB.roles || {})
+  ])].sort();
+
+  // Compute pass rate per role for each interviewer
+  function getRolePassRates(entries, roles) {
+    const result = {};
+    roles.forEach(role => {
+      const roleEntries = entries.filter(e => e.role === role);
+      if (roleEntries.length > 0) {
+        const hires = roleEntries.filter(e => e.decision === 'hire' || e.decision === 'strong_hire').length;
+        result[role] = Math.round(hires / roleEntries.length * 100);
+      } else {
+        result[role] = 0;
+      }
+    });
+    return result;
+  }
+
+  const entriesA = appData.entries.filter(e => e.interviewer === nameA);
+  const entriesB = appData.entries.filter(e => e.interviewer === nameB);
+  const ratesA = getRolePassRates(entriesA, allRoles);
+  const ratesB = getRolePassRates(entriesB, allRoles);
+
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: allRoles,
+      datasets: [
+        {
+          label: nameA,
+          data: allRoles.map(r => -(ratesA[r] || 0)),
+          backgroundColor: ACCENT.blue,
+          borderRadius: 3,
+        },
+        {
+          label: nameB,
+          data: allRoles.map(r => ratesB[r] || 0),
+          backgroundColor: ACCENT.green,
+          borderRadius: 3,
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${Math.abs(ctx.raw)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#1a1a2e' },
+          ticks: {
+            color: '#a0a0b0',
+            callback: v => Math.abs(v) + '%'
+          },
+          suggestedMin: -100,
+          suggestedMax: 100,
+        },
+        y: { grid: { display: false }, ticks: { color: '#a0a0b0' } },
+      },
+    },
+  });
+}
+
+// --- Comparison: Score Distribution Grouped Bar ---
+function renderComparisonScores(canvasId, statsA, statsB, nameA, nameB) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  const scores = ['1', '2', '3', '4', '5'];
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: scores.map(s => 'Score ' + s),
+      datasets: [
+        {
+          label: nameA,
+          data: scores.map(s => (statsA.score_distribution || {})[s] || 0),
+          backgroundColor: ACCENT.blue,
+          borderRadius: 3,
+        },
+        {
+          label: nameB,
+          data: scores.map(s => (statsB.score_distribution || {})[s] || 0),
+          backgroundColor: ACCENT.green,
+          borderRadius: 3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded' } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#a0a0b0' } },
+        y: { grid: { color: '#1a1a2e' }, ticks: { color: '#a0a0b0', stepSize: 1 }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+// --- Comparison: Decision Donut ---
+function renderComparisonDonut(canvasId, stats, name) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  const decisions = ['strong_hire', 'hire', 'maybe', 'no_hire', 'strong_no_hire'];
+  const labels = decisions.map(d => d.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+  const values = decisions.map(d => (stats.decisions || {})[d] || 0);
+  const colors = decisions.map(d => DECISION_COLORS[d]);
+
+  return new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 10, usePointStyle: true, pointStyle: 'rectRounded', font: { size: 10 } } },
+      },
+    },
+  });
+}
+
+// --- Comparison: Theme Radar ---
+function renderComparisonRadar(canvasId, stats, name, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  const themes = Object.keys(stats.themes || {}).sort();
+  if (themes.length === 0) {
+    canvas.parentElement.querySelector('.card-title').insertAdjacentHTML('afterend',
+      '<p class="text-muted text-center" style="padding:20px;">No theme data</p>');
+    return null;
+  }
+  const values = themes.map(t => stats.themes[t]);
+  const labels = themes.map(t => t.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+
+  return new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: name,
+        data: values,
+        backgroundColor: color + '25',
+        borderColor: color,
+        borderWidth: 2,
+        pointBackgroundColor: color,
+        pointBorderColor: '#fff',
+        pointRadius: 4,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          grid: { color: '#1a1a2e' },
+          angleLines: { color: '#1a1a2e' },
+          ticks: { color: '#6b6b7b', backdropColor: 'transparent' },
+          pointLabels: { color: '#a0a0b0', font: { size: 10 } },
+        },
+      },
+    },
+  });
+}
+
 // --- Red Flags (HTML List) ---
 function renderRedFlags(containerId, data) {
   const container = document.getElementById(containerId);

@@ -19,6 +19,7 @@
       <li><a href="#" data-page="upload"><span class="nav-icon">&#8682;</span><span>Upload</span></a></li>
       <li><a href="#" data-page="interviewers"><span class="nav-icon">&#9823;</span><span>Interviewers</span></a></li>
       <li><a href="#" data-page="roles"><span class="nav-icon">&#9881;</span><span>Roles</span></a></li>
+      <li><a href="#" data-page="settings"><span class="nav-icon">&#9881;</span><span>Settings</span></a></li>
     </ul>
     <div class="sidebar-footer">
       <button id="resetBtn" title="Reset to sample data">&#8635; Reset Data</button>
@@ -30,9 +31,14 @@
 
     <!-- Dashboard Page -->
     <div id="page-dashboard" class="page active">
-      <div class="page-header">
-        <h2>Dashboard</h2>
-        <p>Hiring feedback analytics at a glance</p>
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Hiring feedback analytics at a glance</p>
+        </div>
+        <button class="btn btn-secondary" id="exportReportBtn" title="Export CSV Report" style="display:flex;align-items:center;gap:6px;">
+          &#8615; Export Report
+        </button>
       </div>
 
       <!-- Summary Stats -->
@@ -90,6 +96,7 @@
           <div class="card-title">
             Interviewer Calibration
             <span class="info-icon">&#9432;<span class="tooltip">Pass rate by interviewer and role — spot who's too harsh or lenient</span></span>
+            <button class="chart-export-btn" data-chart="calibration-heatmap" title="Export as PNG">&#8615;</button>
           </div>
           <div id="calibration-heatmap" class="heatmap-container"></div>
         </div>
@@ -97,6 +104,7 @@
           <div class="card-title">
             Decision Distribution by Role
             <span class="info-icon">&#9432;<span class="tooltip">Breakdown of hiring decisions for each role</span></span>
+            <button class="chart-export-btn" data-chart="chart-decisions" title="Export as PNG">&#8615;</button>
           </div>
           <canvas id="chart-decisions"></canvas>
         </div>
@@ -104,6 +112,7 @@
           <div class="card-title">
             Interviewer Agreement
             <span class="info-icon">&#9432;<span class="tooltip">How often interviewers agree when evaluating the same candidate</span></span>
+            <button class="chart-export-btn" data-chart="agreement-heatmap" title="Export as PNG">&#8615;</button>
           </div>
           <div id="agreement-heatmap" class="heatmap-container"></div>
         </div>
@@ -111,6 +120,7 @@
           <div class="card-title">
             Score Distribution
             <span class="info-icon">&#9432;<span class="tooltip">Distribution of scores each interviewer gives</span></span>
+            <button class="chart-export-btn" data-chart="chart-scores" title="Export as PNG">&#8615;</button>
           </div>
           <canvas id="chart-scores"></canvas>
         </div>
@@ -118,6 +128,7 @@
           <div class="card-title">
             Theme Frequency
             <span class="info-icon">&#9432;<span class="tooltip">How often each evaluation theme appears across all feedback</span></span>
+            <button class="chart-export-btn" data-chart="chart-themes" title="Export as PNG">&#8615;</button>
           </div>
           <canvas id="chart-themes"></canvas>
         </div>
@@ -125,6 +136,7 @@
           <div class="card-title">
             Sentiment Over Time
             <span class="info-icon">&#9432;<span class="tooltip">Average feedback sentiment trending over months</span></span>
+            <button class="chart-export-btn" data-chart="chart-sentiment" title="Export as PNG">&#8615;</button>
           </div>
           <canvas id="chart-sentiment"></canvas>
         </div>
@@ -132,6 +144,7 @@
           <div class="card-title">
             Consistency Gauge
             <span class="info-icon">&#9432;<span class="tooltip">Overall hiring bar consistency score (0-100)</span></span>
+            <button class="chart-export-btn" data-chart="chart-gauge" title="Export as PNG">&#8615;</button>
           </div>
           <canvas id="chart-gauge"></canvas>
         </div>
@@ -139,6 +152,7 @@
           <div class="card-title">
             Word Cloud
             <span class="info-icon">&#9432;<span class="tooltip">Most frequent words across all feedback</span></span>
+            <button class="chart-export-btn" data-chart="word-cloud" title="Export as PNG">&#8615;</button>
           </div>
           <div id="word-cloud" class="word-cloud-container"></div>
         </div>
@@ -200,13 +214,52 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
         <p>Compare interviewer calibration side by side</p>
       </div>
 
-      <div class="comparison-controls">
-        <select id="compare-a"><option value="">Select Interviewer A</option></select>
-        <span class="text-muted">vs</span>
-        <select id="compare-b"><option value="">Select Interviewer B</option></select>
+      <!-- Interviewer Cards Grid -->
+      <div id="interviewerCardsGrid" class="interviewer-cards-grid"></div>
+
+      <!-- Comparison Section -->
+      <div class="comparison-section" style="margin-top:32px;">
+        <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);margin-bottom:16px;">Compare Interviewers</h3>
+        <div class="comparison-controls">
+          <select id="compare-a"><option value="">Select Interviewer A</option></select>
+          <span class="text-muted">vs</span>
+          <select id="compare-b"><option value="">Select Interviewer B</option></select>
+        </div>
       </div>
 
-      <div class="comparison-grid" id="comparisonGrid"></div>
+      <div id="comparisonGrid" class="comparison-grid"></div>
+
+      <!-- Comparison Charts -->
+      <div id="comparisonCharts" class="comparison-charts-container" style="display:none;">
+        <div class="chart-grid" style="margin-top:20px;">
+          <div class="chart-card">
+            <div class="card-title">Pass Rate by Role (Mirrored)</div>
+            <canvas id="chart-compare-passrate"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title">Score Distribution Comparison</div>
+            <canvas id="chart-compare-scores"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title">Decision Breakdown — Interviewer A</div>
+            <canvas id="chart-compare-donut-a"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title">Decision Breakdown — Interviewer B</div>
+            <canvas id="chart-compare-donut-b"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title">Theme Preferences — Interviewer A</div>
+            <canvas id="chart-compare-radar-a"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title">Theme Preferences — Interviewer B</div>
+            <canvas id="chart-compare-radar-b"></canvas>
+          </div>
+        </div>
+        <!-- Calibration Gap Score -->
+        <div id="calibrationGapSection" class="calibration-gap-section" style="margin-top:20px;"></div>
+      </div>
     </div>
 
     <!-- Roles Page -->
@@ -215,7 +268,28 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
         <h2>Roles</h2>
         <p>Breakdown of hiring metrics by role</p>
       </div>
-      <div id="roles-content" class="chart-grid"></div>
+      <!-- Role Rankings -->
+      <div id="roleRankings" class="role-rankings"></div>
+      <!-- Role Cards -->
+      <div id="roles-content" class="chart-grid" style="margin-top:24px;"></div>
+      <!-- Role Detail Expansion -->
+      <div id="roleDetail" class="role-detail-section" style="display:none;margin-top:24px;"></div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="page-settings" class="page">
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>Manage saved sessions and data</p>
+      </div>
+      <div class="settings-actions" style="display:flex;gap:12px;margin-bottom:24px;">
+        <button class="btn btn-primary" id="saveSessionBtn">Save Current Session</button>
+        <button class="btn btn-secondary" id="clearDataBtn">Clear &amp; Reload Sample Data</button>
+        <button class="btn btn-secondary" id="deleteAllSessionsBtn" style="color:var(--accent-red);border-color:rgba(239,68,68,0.3);">Delete All Sessions</button>
+      </div>
+      <div id="sessionsStatus" class="upload-status" style="margin-bottom:16px;"></div>
+      <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);margin-bottom:16px;">Saved Sessions</h3>
+      <div id="sessionsGrid" class="sessions-grid"></div>
     </div>
 
   </div>
