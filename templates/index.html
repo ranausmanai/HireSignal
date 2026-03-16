@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Insights — Visual Feedback Analyzer</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Interview Insights</h1>
+      <span>Feedback Analyzer</span>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#" data-page="dashboard" class="active"><span class="nav-icon">&#9635;</span><span>Dashboard</span></a></li>
+      <li><a href="#" data-page="upload"><span class="nav-icon">&#8682;</span><span>Upload</span></a></li>
+      <li><a href="#" data-page="interviewers"><span class="nav-icon">&#9823;</span><span>Interviewers</span></a></li>
+      <li><a href="#" data-page="roles"><span class="nav-icon">&#9881;</span><span>Roles</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button id="resetBtn" title="Reset to sample data">&#8635; Reset Data</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Hiring feedback analytics at a glance</p>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="summary-grid">
+        <div class="summary-stat">
+          <div class="stat-label">Total Interviews</div>
+          <div class="stat-value blue" id="stat-total">—</div>
+        </div>
+        <div class="summary-stat">
+          <div class="stat-label">Interviewers</div>
+          <div class="stat-value purple" id="stat-interviewers">—</div>
+        </div>
+        <div class="summary-stat">
+          <div class="stat-label">Candidates</div>
+          <div class="stat-value blue" id="stat-candidates">—</div>
+        </div>
+        <div class="summary-stat">
+          <div class="stat-label">Pass Rate</div>
+          <div class="stat-value green" id="stat-pass-rate">—</div>
+        </div>
+        <div class="summary-stat">
+          <div class="stat-label">Consistency</div>
+          <div class="stat-value yellow" id="stat-consistency">—</div>
+        </div>
+      </div>
+
+      <!-- Executive Summary -->
+      <div class="executive-summary">
+        <h3>Executive Summary</h3>
+        <p id="exec-summary">Loading...</p>
+        <ul class="insights-list" id="insights-list"></ul>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <select id="filter-role"><option value="">All Roles</option></select>
+        <select id="filter-interviewer"><option value="">All Interviewers</option></select>
+        <select id="filter-decision">
+          <option value="">All Decisions</option>
+          <option value="strong_hire">Strong Hire</option>
+          <option value="hire">Hire</option>
+          <option value="maybe">Maybe</option>
+          <option value="no_hire">No Hire</option>
+          <option value="strong_no_hire">Strong No Hire</option>
+        </select>
+        <input type="date" id="filter-date-from" placeholder="From">
+        <input type="date" id="filter-date-to" placeholder="To">
+        <button class="btn btn-primary" id="applyFilters">Apply</button>
+        <button class="btn btn-secondary" id="clearFilters">Clear</button>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="card-title">
+            Interviewer Calibration
+            <span class="info-icon">&#9432;<span class="tooltip">Pass rate by interviewer and role — spot who's too harsh or lenient</span></span>
+          </div>
+          <div id="calibration-heatmap" class="heatmap-container"></div>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Decision Distribution by Role
+            <span class="info-icon">&#9432;<span class="tooltip">Breakdown of hiring decisions for each role</span></span>
+          </div>
+          <canvas id="chart-decisions"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Interviewer Agreement
+            <span class="info-icon">&#9432;<span class="tooltip">How often interviewers agree when evaluating the same candidate</span></span>
+          </div>
+          <div id="agreement-heatmap" class="heatmap-container"></div>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Score Distribution
+            <span class="info-icon">&#9432;<span class="tooltip">Distribution of scores each interviewer gives</span></span>
+          </div>
+          <canvas id="chart-scores"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Theme Frequency
+            <span class="info-icon">&#9432;<span class="tooltip">How often each evaluation theme appears across all feedback</span></span>
+          </div>
+          <canvas id="chart-themes"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Sentiment Over Time
+            <span class="info-icon">&#9432;<span class="tooltip">Average feedback sentiment trending over months</span></span>
+          </div>
+          <canvas id="chart-sentiment"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Consistency Gauge
+            <span class="info-icon">&#9432;<span class="tooltip">Overall hiring bar consistency score (0-100)</span></span>
+          </div>
+          <canvas id="chart-gauge"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">
+            Word Cloud
+            <span class="info-icon">&#9432;<span class="tooltip">Most frequent words across all feedback</span></span>
+          </div>
+          <div id="word-cloud" class="word-cloud-container"></div>
+        </div>
+        <div class="chart-card full-width">
+          <div class="card-title">
+            Red Flags
+            <span class="info-icon">&#9432;<span class="tooltip">Detected calibration inconsistencies and concerns</span></span>
+          </div>
+          <ul id="red-flags" class="red-flags-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Page -->
+    <div id="page-upload" class="page">
+      <div class="page-header">
+        <h2>Upload Feedback</h2>
+        <p>Import interview feedback from files or paste text directly</p>
+      </div>
+
+      <div class="upload-tabs">
+        <button class="upload-tab active" data-tab="files">Upload Files</button>
+        <button class="upload-tab" data-tab="paste">Paste Text</button>
+      </div>
+
+      <div id="tab-files" class="upload-content active">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" multiple accept=".txt,.csv,.json,.md">
+          <div class="drop-zone-icon">&#128196;</div>
+          <h3>Drop your feedback files here</h3>
+          <p>Supports .txt, .csv, .json, .md files — or click to browse</p>
+        </div>
+      </div>
+
+      <div id="tab-paste" class="upload-content">
+        <textarea class="paste-area" id="pasteArea" placeholder="Paste interview feedback here...
+
+Example format:
+Interviewer: Sarah Chen
+Candidate: Alex Rivera
+Role: Backend Engineer
+Decision: Hire
+Score: 4/5
+
+Strong technical skills demonstrated during the coding exercise. Good communication throughout. Would recommend hiring."></textarea>
+        <div class="paste-actions">
+          <button class="btn btn-primary" id="submitPaste">Submit Feedback</button>
+          <button class="btn btn-secondary" id="clearPaste">Clear</button>
+        </div>
+      </div>
+
+      <div id="uploadStatus" class="upload-status"></div>
+    </div>
+
+    <!-- Interviewers Page -->
+    <div id="page-interviewers" class="page">
+      <div class="page-header">
+        <h2>Interviewers</h2>
+        <p>Compare interviewer calibration side by side</p>
+      </div>
+
+      <div class="comparison-controls">
+        <select id="compare-a"><option value="">Select Interviewer A</option></select>
+        <span class="text-muted">vs</span>
+        <select id="compare-b"><option value="">Select Interviewer B</option></select>
+      </div>
+
+      <div class="comparison-grid" id="comparisonGrid"></div>
+    </div>
+
+    <!-- Roles Page -->
+    <div id="page-roles" class="page">
+      <div class="page-header">
+        <h2>Roles</h2>
+        <p>Breakdown of hiring metrics by role</p>
+      </div>
+      <div id="roles-content" class="chart-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- Drill-down Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Feedback Details</h3>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
