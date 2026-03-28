@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data (user uploads and generated content)
+data/uploads/*
+data/sessions/*
+data/decks/*
+!data/uploads/.gitkeep
+!data/sessions/.gitkeep
+
+# OS
+.DS_Store
+*.DS_Store
+
+# Env
+.env
+*.env

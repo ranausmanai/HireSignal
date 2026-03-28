@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interview Insights — Visual Feedback Analyzer</title>
+  <title>HireSignal — Interview Feedback Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -11,17 +12,31 @@
   <!-- Sidebar -->
   <nav class="sidebar">
     <div class="sidebar-logo">
-      <h1>Interview Insights</h1>
-      <span>Feedback Analyzer</span>
+      <svg class="sidebar-logo-icon" viewBox="0 0 32 32" width="28" height="28">
+        <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4F8FFF"/><stop offset="100%" stop-color="#34D399"/></linearGradient></defs>
+        <rect width="32" height="32" rx="7" fill="#0f0f17"/>
+        <path d="M8 22 L12 12 L16 18 L20 8 L24 14" stroke="url(#lg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="24" cy="14" r="2.5" fill="#34D399"/><circle cx="20" cy="8" r="2" fill="#4F8FFF" opacity="0.8"/>
+      </svg>
+      <div>
+        <h1>HireSignal</h1>
+        <span>Interview Feedback Intelligence</span>
+      </div>
     </div>
     <ul class="sidebar-nav">
-      <li><a href="#" data-page="dashboard" class="active"><span class="nav-icon">&#9635;</span><span>Dashboard</span></a></li>
-      <li><a href="#" data-page="upload"><span class="nav-icon">&#8682;</span><span>Upload</span></a></li>
-      <li><a href="#" data-page="interviewers"><span class="nav-icon">&#9823;</span><span>Interviewers</span></a></li>
-      <li><a href="#" data-page="roles"><span class="nav-icon">&#9881;</span><span>Roles</span></a></li>
-      <li><a href="#" data-page="settings"><span class="nav-icon">&#9881;</span><span>Settings</span></a></li>
+      <li><a href="#" data-page="dashboard" class="active"><span class="nav-icon">&#9635;</span><span>Overview</span></a></li>
+      <li><a href="#" data-page="upload"><span class="nav-icon">&#8682;</span><span>Add Feedback</span></a></li>
+      <li><a href="#" data-page="interviewers"><span class="nav-icon">&#9823;</span><span>Interview Team</span></a></li>
+      <li><a href="#" data-page="roles"><span class="nav-icon">&#9881;</span><span>Role Pipelines</span></a></li>
+      <li><a href="#" data-page="insights"><span class="nav-icon">&#9733;</span><span>Insights</span></a></li>
+      <li><a href="#" data-page="copilot"><span class="nav-icon">&#9998;</span><span>Copilot</span></a></li>
+      <li><a href="#" data-page="settings"><span class="nav-icon">&#9881;</span><span>Data Sources</span></a></li>
     </ul>
     <div class="sidebar-footer">
+      <div class="llm-status-pill" id="llmStatusPill" title="AI backend" data-page-jump="settings">
+        <span class="status-dot" id="llmStatusDot"></span>
+        <span id="llmStatusLabel">AI: checking…</span>
+      </div>
       <button id="resetBtn" title="Reset to sample data">&#8635; Reset Data</button>
     </div>
   </nav>
@@ -33,46 +48,87 @@
     <div id="page-dashboard" class="page active">
       <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <h2>Dashboard</h2>
-          <p>Hiring feedback analytics at a glance</p>
+          <h2>Hiring Command Center</h2>
+          <p>What needs recruiter attention, what is drifting, and what to say next</p>
         </div>
-        <button class="btn btn-secondary" id="exportReportBtn" title="Export CSV Report" style="display:flex;align-items:center;gap:6px;">
-          &#8615; Export Report
-        </button>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <select id="datasetScope" class="dataset-scope-select">
+            <option value="all">All datasets</option>
+          </select>
+          <button class="btn btn-secondary" id="exportReportBtn" title="Export CSV Report" style="display:flex;align-items:center;gap:6px;">
+            &#8615; Export Report
+          </button>
+        </div>
       </div>
+
+      <div class="recruiter-hero">
+        <div class="recruiter-hero-main">
+          <div class="copilot-eyebrow">Recruiter Brief</div>
+          <h3 id="priority-headline">Loading the current hiring picture...</h3>
+          <p id="priority-subline">Collecting the active queue, role pressure points, and interviewer drift.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-page-jump="copilot">Ask Copilot</button>
+            <button class="btn btn-secondary" data-page-jump="upload">Add New Feedback</button>
+          </div>
+        </div>
+        <div class="recruiter-hero-side">
+          <div class="hero-callout">
+            <div class="hero-callout-label">Say This In Sync</div>
+            <div id="sync-talk-track" class="hero-callout-copy">Preparing a short recruiter-ready summary.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="datasetScopeSummary" class="dataset-scope-summary"></div>
 
       <!-- Summary Stats -->
       <div class="summary-grid">
         <div class="summary-stat">
-          <div class="stat-label">Total Interviews</div>
+          <div class="stat-label">Feedback Items</div>
           <div class="stat-value blue" id="stat-total">—</div>
         </div>
         <div class="summary-stat">
-          <div class="stat-label">Interviewers</div>
-          <div class="stat-value purple" id="stat-interviewers">—</div>
-        </div>
-        <div class="summary-stat">
           <div class="stat-label">Candidates</div>
-          <div class="stat-value blue" id="stat-candidates">—</div>
+          <div class="stat-value purple" id="stat-candidates">—</div>
         </div>
         <div class="summary-stat">
-          <div class="stat-label">Pass Rate</div>
-          <div class="stat-value green" id="stat-pass-rate">—</div>
+          <div class="stat-label">Review Queue</div>
+          <div class="stat-value yellow" id="stat-review-queue">—</div>
         </div>
         <div class="summary-stat">
-          <div class="stat-label">Consistency</div>
-          <div class="stat-value yellow" id="stat-consistency">—</div>
+          <div class="stat-label">High-Risk Interviewers</div>
+          <div class="stat-value red" id="stat-high-risk">—</div>
+        </div>
+        <div class="summary-stat">
+          <div class="stat-label">Analysis Coverage</div>
+          <div class="stat-value green" id="stat-analysis-coverage">—</div>
+        </div>
+      </div>
+
+      <div class="dashboard-focus-grid">
+        <div class="focus-card">
+          <div class="card-title">Needs Attention Now</div>
+          <div id="priority-list" class="priority-list"></div>
+        </div>
+        <div class="focus-card">
+          <div class="card-title">Recommended Next Moves</div>
+          <div id="next-actions" class="next-actions"></div>
         </div>
       </div>
 
       <!-- Executive Summary -->
-      <div class="executive-summary">
-        <h3>Executive Summary</h3>
+      <div class="executive-summary narrative-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin-bottom:0;">Leadership Summary</h3>
+          <button class="btn btn-ai" id="generateNarrativeBtn">
+            <span id="narrativeBtnText">Refresh Leadership Summary</span>
+            <span id="narrativeSpinner" class="spinner" style="display:none;"></span>
+          </button>
+        </div>
         <p id="exec-summary">Loading...</p>
         <ul class="insights-list" id="insights-list"></ul>
       </div>
 
-      <!-- Filter Bar -->
       <div class="filter-bar">
         <select id="filter-role"><option value="">All Roles</option></select>
         <select id="filter-interviewer"><option value="">All Interviewers</option></select>
@@ -90,76 +146,59 @@
         <button class="btn btn-secondary" id="clearFilters">Clear</button>
       </div>
 
-      <!-- Charts Grid -->
+      <div class="chart-card full-width-card" style="margin-bottom:24px;">
+        <div class="card-title">
+          Decision Flow
+          <span class="info-icon">&#9432;<span class="tooltip">Distribution of decisions in the current slice of data</span></span>
+        </div>
+        <div id="decision-funnel" class="decision-funnel"></div>
+      </div>
+
       <div class="chart-grid">
         <div class="chart-card">
           <div class="card-title">
-            Interviewer Calibration
-            <span class="info-icon">&#9432;<span class="tooltip">Pass rate by interviewer and role — spot who's too harsh or lenient</span></span>
-            <button class="chart-export-btn" data-chart="calibration-heatmap" title="Export as PNG">&#8615;</button>
+            Candidate Review Queue
+            <span class="info-icon">&#9432;<span class="tooltip">Candidates with conflicting signals, blockers, or weak decision confidence</span></span>
           </div>
-          <div id="calibration-heatmap" class="heatmap-container"></div>
+          <div id="candidate-review-queue"></div>
         </div>
+
         <div class="chart-card">
           <div class="card-title">
-            Decision Distribution by Role
-            <span class="info-icon">&#9432;<span class="tooltip">Breakdown of hiring decisions for each role</span></span>
-            <button class="chart-export-btn" data-chart="chart-decisions" title="Export as PNG">&#8615;</button>
+            Interviewer Risk Map
+            <span class="info-icon">&#9432;<span class="tooltip">Strictness, disagreement, and blocker patterns rolled up by interviewer</span></span>
           </div>
-          <canvas id="chart-decisions"></canvas>
+          <div id="interviewer-risk-map"></div>
         </div>
+
         <div class="chart-card">
           <div class="card-title">
-            Interviewer Agreement
-            <span class="info-icon">&#9432;<span class="tooltip">How often interviewers agree when evaluating the same candidate</span></span>
-            <button class="chart-export-btn" data-chart="agreement-heatmap" title="Export as PNG">&#8615;</button>
+            Reason Signals
+            <span class="info-icon">&#9432;<span class="tooltip">Repeated blockers and strengths extracted from the feedback text</span></span>
           </div>
-          <div id="agreement-heatmap" class="heatmap-container"></div>
+          <div id="reason-signals"></div>
         </div>
+
         <div class="chart-card">
           <div class="card-title">
-            Score Distribution
-            <span class="info-icon">&#9432;<span class="tooltip">Distribution of scores each interviewer gives</span></span>
-            <button class="chart-export-btn" data-chart="chart-scores" title="Export as PNG">&#8615;</button>
+            Role Health
+            <span class="info-icon">&#9432;<span class="tooltip">Per-role throughput, calibration spread, and top blockers</span></span>
           </div>
-          <canvas id="chart-scores"></canvas>
+          <div id="role-health-grid"></div>
         </div>
-        <div class="chart-card">
-          <div class="card-title">
-            Theme Frequency
-            <span class="info-icon">&#9432;<span class="tooltip">How often each evaluation theme appears across all feedback</span></span>
-            <button class="chart-export-btn" data-chart="chart-themes" title="Export as PNG">&#8615;</button>
-          </div>
-          <canvas id="chart-themes"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="card-title">
-            Sentiment Over Time
-            <span class="info-icon">&#9432;<span class="tooltip">Average feedback sentiment trending over months</span></span>
-            <button class="chart-export-btn" data-chart="chart-sentiment" title="Export as PNG">&#8615;</button>
-          </div>
-          <canvas id="chart-sentiment"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="card-title">
-            Consistency Gauge
-            <span class="info-icon">&#9432;<span class="tooltip">Overall hiring bar consistency score (0-100)</span></span>
-            <button class="chart-export-btn" data-chart="chart-gauge" title="Export as PNG">&#8615;</button>
-          </div>
-          <canvas id="chart-gauge"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="card-title">
-            Word Cloud
-            <span class="info-icon">&#9432;<span class="tooltip">Most frequent words across all feedback</span></span>
-            <button class="chart-export-btn" data-chart="word-cloud" title="Export as PNG">&#8615;</button>
-          </div>
-          <div id="word-cloud" class="word-cloud-container"></div>
-        </div>
+
         <div class="chart-card full-width">
           <div class="card-title">
-            Red Flags
-            <span class="info-icon">&#9432;<span class="tooltip">Detected calibration inconsistencies and concerns</span></span>
+            Round Effectiveness
+            <span class="info-icon">&#9432;<span class="tooltip">Which interview round types are driving signals and blockers</span></span>
+          </div>
+          <div id="round-insights"></div>
+        </div>
+
+        <div class="chart-card full-width">
+          <div class="card-title">
+            Calibration Alerts
+            <span class="info-icon">&#9432;<span class="tooltip">Flagged interviewer outliers and low-agreement pairs</span></span>
           </div>
           <ul id="red-flags" class="red-flags-list"></ul>
         </div>
@@ -169,8 +208,8 @@
     <!-- Upload Page -->
     <div id="page-upload" class="page">
       <div class="page-header">
-        <h2>Upload Feedback</h2>
-        <p>Import interview feedback from files or paste text directly</p>
+        <h2>Add Feedback</h2>
+        <p>Import scorecards, exported notes, or pasted interviewer feedback without manual cleanup</p>
       </div>
 
       <div class="upload-tabs">
@@ -178,12 +217,24 @@
         <button class="upload-tab" data-tab="paste">Paste Text</button>
       </div>
 
+      <div class="focus-card" style="margin-bottom:20px;">
+        <div class="card-title">Where Should This Data Go?</div>
+        <div class="dataset-form-grid">
+          <select id="uploadDatasetMode">
+            <option value="new">Create new dataset</option>
+            <option value="merge">Merge into active dataset</option>
+            <option value="replace">Replace all current datasets</option>
+          </select>
+          <input id="uploadDatasetName" type="text" placeholder="Dataset name, e.g. CZ PHP March 2026">
+        </div>
+      </div>
+
       <div id="tab-files" class="upload-content active">
         <div class="drop-zone" id="dropZone">
-          <input type="file" id="fileInput" multiple accept=".txt,.csv,.json,.md">
+          <input type="file" id="fileInput" multiple accept=".txt,.csv,.json,.md,.pdf">
           <div class="drop-zone-icon">&#128196;</div>
-          <h3>Drop your feedback files here</h3>
-          <p>Supports .txt, .csv, .json, .md files — or click to browse</p>
+          <h3>Drop exported feedback here</h3>
+          <p>Supports .pdf, .txt, .csv, .json, .md files. Raw notes, scorecards, and recruiter exports all work.</p>
         </div>
       </div>
 
@@ -210,9 +261,11 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
     <!-- Interviewers Page -->
     <div id="page-interviewers" class="page">
       <div class="page-header">
-        <h2>Interviewers</h2>
-        <p>Compare interviewer calibration side by side</p>
+        <h2>Interview Team</h2>
+        <p>See who is strict, who is lenient, and where recruiter escalation or calibration is needed</p>
       </div>
+
+      <div id="teamPriorityStrip" class="dashboard-focus-grid" style="margin-bottom:24px;"></div>
 
       <!-- Interviewer Cards Grid -->
       <div id="interviewerCardsGrid" class="interviewer-cards-grid"></div>
@@ -265,9 +318,10 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
     <!-- Roles Page -->
     <div id="page-roles" class="page">
       <div class="page-header">
-        <h2>Roles</h2>
-        <p>Breakdown of hiring metrics by role</p>
+        <h2>Role Pipelines</h2>
+        <p>Find which pipelines are healthy, noisy, or blocked by repeated interview issues</p>
       </div>
+      <div id="roleSummaryStrip" class="dashboard-focus-grid" style="margin-bottom:24px;"></div>
       <!-- Role Rankings -->
       <div id="roleRankings" class="role-rankings"></div>
       <!-- Role Cards -->
@@ -276,20 +330,352 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
       <div id="roleDetail" class="role-detail-section" style="display:none;margin-top:24px;"></div>
     </div>
 
-    <!-- Settings Page -->
+    <!-- Insights Page -->
+    <div id="page-insights" class="page">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2>Deep Insights</h2>
+          <p>AI-extracted patterns from feedback text — what's driving hire/no-hire decisions</p>
+        </div>
+        <button class="btn btn-ai" id="runAnalysisBtn">
+          <span id="analysisBtnText">Run Deep Analysis</span>
+          <span id="analysisSpinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+
+      <div id="analysisStatus" class="upload-status" style="margin-bottom:20px;"></div>
+
+      <!-- Insight Headline -->
+      <div id="insights-headline" class="ins-headline"></div>
+
+      <!-- Reasons: side by side -->
+      <div id="reasons-section" style="display:none;">
+        <div class="ins-section-head">
+          <h3>Why candidates pass or fail</h3>
+          <p>Standardized reasons extracted from feedback text, ranked by frequency</p>
+        </div>
+        <div class="ins-reasons-grid">
+          <div class="ins-reason-col ins-reason-pos">
+            <div class="ins-reason-col-head">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Strengths
+            </div>
+            <div id="positive-reasons-list" class="ins-reason-list"></div>
+          </div>
+          <div class="ins-reason-col ins-reason-neg">
+            <div class="ins-reason-col-head">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Blockers
+            </div>
+            <div id="negative-reasons-list" class="ins-reason-list"></div>
+          </div>
+        </div>
+
+        <div class="ins-impact-section">
+          <div class="ins-section-head">
+            <h3>Reason → Decision Impact</h3>
+            <p>How strongly each reason correlates with the final hire/no-hire outcome</p>
+          </div>
+          <div id="reason-impact-list" class="ins-reason-list"></div>
+        </div>
+      </div>
+
+      <!-- Hiring Bar -->
+      <div id="hiring-bar-section" style="display:none;">
+        <div class="ins-section-head">
+          <h3>Where is the hiring bar?</h3>
+          <p>How interview scores translate into actual decisions — and whether the team is consistent</p>
+        </div>
+        <div class="ins-chart-pair">
+          <div class="ins-chart-card">
+            <div class="ins-chart-label">Score → Hire Rate</div>
+            <div class="ins-chart-desc">At what score does the team start saying yes?</div>
+            <div class="ins-chart-wrap"><canvas id="chart-hiring-bar"></canvas></div>
+          </div>
+          <div class="ins-chart-card">
+            <div class="ins-chart-label">Decision Spread by Score</div>
+            <div class="ins-chart-desc">Do interviewers agree on what each score means?</div>
+            <div class="ins-chart-wrap"><canvas id="chart-score-decisions"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cross-Round Correlation -->
+      <div id="cross-round-section" style="display:none;">
+        <div class="ins-section-head">
+          <h3>Do rounds agree on the same candidates?</h3>
+          <p>When a candidate does well in the take-home, do they also do well in the tech interview? This shows score alignment across round types per candidate.</p>
+        </div>
+        <div id="round-pair-summary" class="ins-round-summary" style="margin-bottom:20px;"></div>
+        <div id="cross-round-table" class="ins-cross-round"></div>
+      </div>
+
+      <!-- Round Correlation -->
+      <div id="round-correlation-section" style="display:none;">
+        <div class="ins-section-head">
+          <h3>Which rounds are predictive?</h3>
+          <p>Distribution of round types and how each one contributes to the overall signal</p>
+        </div>
+        <div class="ins-round-grid">
+          <div class="ins-round-summary" id="round-summary-cards"></div>
+          <div class="ins-chart-card">
+            <div class="ins-chart-label">Round Mix</div>
+            <div class="ins-chart-wrap ins-chart-wrap-sm"><canvas id="chart-round-dist"></canvas></div>
+          </div>
+          <div class="ins-chart-card ins-chart-wide">
+            <div class="ins-chart-label">Avg Score by Round Type</div>
+            <div class="ins-chart-desc">Which rounds surface the sharpest signal?</div>
+            <div class="ins-chart-wrap"><canvas id="chart-round-scores"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interviewer Styles -->
+      <div id="styles-section" style="display:none;">
+        <div class="ins-section-head">
+          <h3>How interviewers write feedback</h3>
+          <p>Tone, length, and focus areas extracted from each interviewer's writing style</p>
+        </div>
+        <div id="style-profiles-grid" class="ins-styles-grid"></div>
+      </div>
+    </div>
+
+    <!-- Copilot Page -->
+    <div id="page-copilot" class="page">
+
+      <div class="cop-workspace">
+        <!-- Chat column -->
+        <div class="cop-chat-col">
+          <div class="cop-chat-chrome">
+            <div class="cop-chat-header">
+              <div class="cop-avatar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z"/><path d="M5 10a7 7 0 0014 0"/><path d="M8 22v-2a4 4 0 014-4v0a4 4 0 014 4v2"/></svg>
+              </div>
+              <div>
+                <div class="cop-header-title">Copilot</div>
+                <div class="cop-header-sub" id="copilotStatusLine">Ask anything about your hiring data</div>
+              </div>
+              <button class="cop-thread-btn" id="resetChatBtn" title="Start a new thread">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                New thread
+              </button>
+            </div>
+
+            <div id="chatMessages" class="cop-messages">
+              <div class="cop-welcome">
+                <div class="cop-welcome-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <h3>What would you like to know?</h3>
+                <p>I can answer questions about interviewers, candidates, pipelines, blockers, round effectiveness, and more.</p>
+              </div>
+              <div class="cop-starters">
+                <button class="cop-starter" data-chat-prompt="Why are Jan and Matej reaching different outcomes for PHP candidates?">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                  Interviewer disagreement
+                </button>
+                <button class="cop-starter" data-chat-prompt="What are the top recurring blockers in the PHP Developer pipeline?">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+                  Top blockers
+                </button>
+                <button class="cop-starter" data-chat-prompt="Which candidates should leadership review first and why?">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+                  Review queue
+                </button>
+                <button class="cop-starter" data-chat-prompt="Which round seems least predictive right now?">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+                  Round effectiveness
+                </button>
+                <button class="cop-starter" data-chat-prompt="Summarize the overall hiring health and what needs attention this week">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span>
+                  Weekly summary
+                </button>
+                <button class="cop-starter" data-chat-prompt="Compare the take-home round vs the technical interview round — which is more predictive?">
+                  <span class="cop-starter-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+                  Compare rounds
+                </button>
+              </div>
+            </div>
+
+            <div id="chatThinking" class="cop-thinking" style="display:none;">
+              <div class="cop-thinking-dot"><span></span><span></span><span></span></div>
+              <div class="cop-thinking-copy">
+                <div id="chatThinkingTitle" class="cop-thinking-label">Analyzing your data</div>
+                <div id="chatThinkingSubtitle" class="cop-thinking-detail">Pulling signals from the active dataset...</div>
+              </div>
+              <span id="chatThinkingElapsed" class="cop-thinking-elapsed">0s</span>
+            </div>
+
+            <div class="cop-input-area">
+              <textarea id="chatInput" class="cop-input" placeholder="Ask about interviewers, candidates, hiring bar, blockers..." rows="1"></textarea>
+              <button class="cop-send-btn" id="sendChatBtn" title="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deck column -->
+        <div class="cop-deck-col">
+          <div class="cop-deck-section">
+            <div class="cop-deck-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span>Generate Briefing Deck</span>
+            </div>
+            <p class="cop-deck-desc">Turn the active dataset into a presentation-ready HTML briefing.</p>
+
+            <div class="cop-deck-chips">
+              <button class="cop-deck-chip" data-deck-prompt="Leadership briefing on interviewer calibration in CZ and PL pipelines">Leadership calibration</button>
+              <button class="cop-deck-chip" data-deck-prompt="Executive review of PHP pipeline blockers and hiring bar">Pipeline blockers</button>
+              <button class="cop-deck-chip" data-deck-prompt="Weekly hiring sync update with candidate pipeline status">Weekly sync</button>
+            </div>
+
+            <div class="cop-deck-input-wrap">
+              <textarea id="deckTopicInput" class="cop-deck-input" placeholder="Describe the briefing you need..." rows="2">Leadership briefing on interviewer calibration and interview quality</textarea>
+              <button class="btn btn-primary cop-deck-generate" id="generateDeckBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Generate
+              </button>
+            </div>
+
+            <div id="deckThinking" class="cop-deck-thinking" style="display:none;">
+              <div class="cop-deck-thinking-bar"><div class="cop-deck-thinking-fill"></div></div>
+              <div class="cop-deck-thinking-info">
+                <span id="deckThinkingTitle" class="cop-deck-thinking-label">Building deck...</span>
+                <span id="deckThinkingElapsed" class="cop-thinking-elapsed">0s</span>
+              </div>
+              <div id="deckThinkingSubtitle" class="cop-deck-thinking-detail">Structuring slides and evidence.</div>
+              <span id="deckThinkingPhase" style="display:none;"></span>
+            </div>
+
+            <div id="deckStatus" class="upload-status" style="margin-top:12px;"></div>
+          </div>
+
+          <div class="cop-deck-section">
+            <div class="cop-deck-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+              <span>Deck Library</span>
+            </div>
+            <div id="deckLibrary" class="cop-deck-library">
+              <p class="text-muted" style="font-size:0.82rem;">No decks generated yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Data Sources Page -->
     <div id="page-settings" class="page">
       <div class="page-header">
-        <h2>Settings</h2>
-        <p>Manage saved sessions and data</p>
+        <h2>Data Sources</h2>
+        <p>Connect your feedback sources and manage imported datasets</p>
       </div>
-      <div class="settings-actions" style="display:flex;gap:12px;margin-bottom:24px;">
-        <button class="btn btn-primary" id="saveSessionBtn">Save Current Session</button>
-        <button class="btn btn-secondary" id="clearDataBtn">Clear &amp; Reload Sample Data</button>
-        <button class="btn btn-secondary" id="deleteAllSessionsBtn" style="color:var(--accent-red);border-color:rgba(239,68,68,0.3);">Delete All Sessions</button>
-      </div>
+
       <div id="sessionsStatus" class="upload-status" style="margin-bottom:16px;"></div>
-      <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);margin-bottom:16px;">Saved Sessions</h3>
-      <div id="sessionsGrid" class="sessions-grid"></div>
+
+      <!-- Source cards row -->
+      <div class="ds-sources-row">
+
+        <!-- PDF / File Upload source -->
+        <div class="ds-source-card">
+          <div class="ds-source-head">
+            <div class="ds-source-icon">&#128196;</div>
+            <div>
+              <div class="ds-source-title">PDF &amp; File Upload</div>
+              <div class="ds-source-desc">Import scorecards, exported notes, or pasted feedback</div>
+            </div>
+          </div>
+          <div class="ds-source-status">
+            <span class="status-dot connected" id="pdfStatusDot"></span>
+            <span id="pdfStatusText">Ready</span>
+          </div>
+          <button class="btn btn-primary" data-page-jump="upload" style="width:100%;">Upload Files</button>
+        </div>
+
+        <!-- Greenhouse source -->
+        <div class="ds-source-card">
+          <div class="ds-source-head">
+            <div class="ds-source-icon">&#127811;</div>
+            <div>
+              <div class="ds-source-title">Greenhouse ATS</div>
+              <div class="ds-source-desc">Pull interview scorecards directly from Greenhouse Harvest API</div>
+            </div>
+          </div>
+          <div class="ds-source-status">
+            <span class="status-dot disconnected" id="greenhouseStatusDot"></span>
+            <span id="greenhouseStatusText">Not connected</span>
+          </div>
+          <div class="ds-gh-connect">
+            <input type="text" id="greenhouseApiKey" placeholder="API key or type 'mock' for demo"
+                   class="ds-input">
+            <button class="btn btn-primary" id="greenhouseConnectBtn">Connect</button>
+          </div>
+          <button class="btn btn-secondary" id="greenhouseSyncBtn" disabled style="width:100%;">Sync Latest</button>
+          <div id="greenhouseLog" class="ds-log"></div>
+        </div>
+
+      </div>
+
+      <!-- AI Backend -->
+      <div class="ds-ai-section">
+        <h3 class="ds-section-label">AI Backend</h3>
+        <div class="ds-ai-row" id="llmBackendRow">
+          <button class="ds-ai-btn" data-backend="claude" id="llmBtnClaude">
+            <span class="ds-ai-icon">&#9889;</span>
+            <span class="ds-ai-name">Claude Code</span>
+            <span class="ds-ai-avail" id="llmAvailClaude">…</span>
+          </button>
+          <button class="ds-ai-btn" data-backend="codex" id="llmBtnCodex">
+            <span class="ds-ai-icon">&#128640;</span>
+            <span class="ds-ai-name">Codex CLI</span>
+            <span class="ds-ai-avail" id="llmAvailCodex">…</span>
+          </button>
+          <button class="ds-ai-btn" data-backend="ollama" id="llmBtnOllama">
+            <span class="ds-ai-icon">&#127968;</span>
+            <span class="ds-ai-name">Local (Ollama)</span>
+            <span class="ds-ai-avail" id="llmAvailOllama">…</span>
+          </button>
+        </div>
+        <div class="ds-ai-model-row" id="llmModelRow" style="display:none;">
+          <label class="ds-section-label" style="margin:0;">Model</label>
+          <input type="text" id="llmOllamaModel" class="ds-input" value="qwen3.5:0.8b" style="max-width:220px;">
+          <button class="btn btn-secondary btn-sm" id="llmSaveModelBtn">Save</button>
+        </div>
+        <div id="llmSwitchStatus" class="upload-status" style="margin-top:8px;"></div>
+      </div>
+
+      <!-- Active datasets -->
+      <div class="ds-datasets-section">
+        <h3 class="ds-section-label">Your Datasets</h3>
+        <div id="datasetsGrid" class="sessions-grid datasets-grid"></div>
+      </div>
+
+      <!-- Compare datasets (collapsed by default) -->
+      <details class="ds-compare-details">
+        <summary class="ds-compare-toggle">Compare two datasets</summary>
+        <div class="ds-compare-body">
+          <div class="dataset-form-grid" style="margin-bottom:12px;">
+            <select id="compareDatasetA"><option value="">Choose dataset A</option></select>
+            <select id="compareDatasetB"><option value="">Choose dataset B</option></select>
+          </div>
+          <button class="btn btn-secondary" id="runDatasetCompareBtn">Compare</button>
+          <div id="datasetCompareResult" style="margin-top:16px;"></div>
+        </div>
+      </details>
+
+      <!-- Danger zone -->
+      <details class="ds-danger-details">
+        <summary class="ds-danger-toggle">Advanced</summary>
+        <div class="ds-danger-body">
+          <button class="btn btn-secondary" id="saveSessionBtn">Save Snapshot</button>
+          <button class="btn btn-secondary" id="clearDataBtn">Clear &amp; Reload Sample Data</button>
+          <button class="btn btn-secondary ds-danger-btn" id="deleteAllSessionsBtn">Delete All Snapshots</button>
+        </div>
+      </details>
+
+      <!-- Hidden: sessions grid for snapshot management -->
+      <div id="sessionsGrid" class="sessions-grid" style="margin-top:12px;"></div>
     </div>
 
   </div>

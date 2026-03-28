@@ -1,4 +1,4 @@
-/* Interview Insights — Chart Components */
+/* HireSignal — Chart Components */
 
 // Chart.js global defaults for dark theme
 Chart.defaults.color = '#a0a0b0';
@@ -602,6 +602,326 @@ function renderComparisonRadar(canvasId, stats, name, color) {
           ticks: { color: '#6b6b7b', backdropColor: 'transparent' },
           pointLabels: { color: '#a0a0b0', font: { size: 10 } },
         },
+      },
+    },
+  });
+}
+
+// --- Interviewer Pass Rates (Horizontal Bar) ---
+function renderInterviewerPassRates(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  const leaderboard = data.interviewer_leaderboard || [];
+  if (leaderboard.length === 0) {
+    canvas.parentElement.querySelector('.card-title').insertAdjacentHTML('afterend',
+      '<p class="text-muted text-center" style="padding:20px;">No interviewer data</p>');
+    return null;
+  }
+
+  // Sort by pass_rate ascending for horizontal bars (top = highest)
+  const sorted = [...leaderboard].sort((a, b) => a.pass_rate - b.pass_rate);
+  const names = sorted.map(i => {
+    let label = i.name;
+    if (i.label) label += ` (${i.label})`;
+    return label;
+  });
+  const values = sorted.map(i => i.pass_rate);
+  const colors = sorted.map(i => {
+    if (i.pass_rate >= 60) return ACCENT.green;
+    if (i.pass_rate >= 30) return ACCENT.yellow;
+    return ACCENT.red;
+  });
+
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        label: 'Pass Rate %',
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 4,
+        borderSkipped: false,
+        barThickness: 28,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `Pass Rate: ${ctx.raw}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#1a1a2e' },
+          ticks: { color: '#a0a0b0', callback: v => v + '%' },
+          min: 0,
+          max: 100,
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#a0a0b0', font: { size: 12 } },
+        },
+      },
+      onClick: (evt, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const interviewer = sorted[idx].name;
+          const entries = data.entries.filter(e => e.interviewer === interviewer);
+          showModal(`${interviewer} - All Feedback`, entries);
+        }
+      },
+    },
+  });
+}
+
+// --- Hiring Bar Chart ---
+function renderHiringBarChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !data || !data.entries) return null;
+
+  // Group entries by score and calculate hire rate
+  const scoreGroups = {};
+  for (let s = 1; s <= 5; s++) scoreGroups[s] = { total: 0, hires: 0 };
+
+  data.entries.forEach(e => {
+    const score = e.score;
+    if (score >= 1 && score <= 5) {
+      scoreGroups[score].total++;
+      if (e.decision === 'hire' || e.decision === 'strong_hire') {
+        scoreGroups[score].hires++;
+      }
+    }
+  });
+
+  const labels = ['1', '2', '3', '4', '5'];
+  const hireRates = labels.map(s => {
+    const g = scoreGroups[parseInt(s)];
+    return g.total > 0 ? Math.round((g.hires / g.total) * 100) : 0;
+  });
+
+  const barColors = hireRates.map(rate => {
+    if (rate >= 60) return ACCENT.green;
+    if (rate >= 30) return ACCENT.yellow;
+    return ACCENT.red;
+  });
+
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels.map(s => 'Score ' + s),
+      datasets: [{
+        label: 'Hire Rate %',
+        data: hireRates,
+        backgroundColor: barColors,
+        borderRadius: 4,
+        borderSkipped: false,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `Hire Rate: ${ctx.raw}%`
+          }
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#a0a0b0' } },
+        y: {
+          grid: { color: '#1a1a2e' },
+          ticks: { color: '#a0a0b0', callback: v => v + '%' },
+          min: 0,
+          max: 100,
+        },
+      },
+    },
+    plugins: [{
+      id: 'thresholdLine',
+      afterDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        const yPos = scales.y.getPixelForValue(50);
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.moveTo(chartArea.left, yPos);
+        ctx.lineTo(chartArea.right, yPos);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.8)';
+        ctx.font = '11px -apple-system, sans-serif';
+        ctx.fillText('50% threshold', chartArea.right - 90, yPos - 6);
+        ctx.restore();
+      },
+    }],
+  });
+}
+
+// --- Score Decisions Stacked Bar Chart ---
+function renderScoreDecisionsChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !data || !data.entries) return null;
+
+  const scoreGroups = {};
+  for (let s = 1; s <= 5; s++) {
+    scoreGroups[s] = { strong_hire: 0, hire: 0, maybe: 0, no_hire: 0, strong_no_hire: 0 };
+  }
+
+  data.entries.forEach(e => {
+    const score = e.score;
+    if (score >= 1 && score <= 5 && scoreGroups[score][e.decision] !== undefined) {
+      scoreGroups[score][e.decision]++;
+    }
+  });
+
+  const labels = ['1', '2', '3', '4', '5'].map(s => 'Score ' + s);
+  const decisions = ['strong_hire', 'hire', 'maybe', 'no_hire', 'strong_no_hire'];
+
+  const datasets = decisions.map(d => ({
+    label: d.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    data: [1, 2, 3, 4, 5].map(s => scoreGroups[s][d]),
+    backgroundColor: DECISION_COLORS[d],
+    borderRadius: 3,
+    borderSkipped: false,
+  }));
+
+  return new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded', font: { size: 10 } } },
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { color: '#a0a0b0' } },
+        y: { stacked: true, grid: { color: '#1a1a2e' }, ticks: { color: '#a0a0b0', stepSize: 1 }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+// --- Round Distribution Doughnut ---
+function renderRoundDistChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !data || !data.entries) return null;
+
+  const roundCounts = {};
+  data.entries.forEach(e => {
+    const rt = e.round_type || 'unknown';
+    roundCounts[rt] = (roundCounts[rt] || 0) + 1;
+  });
+
+  const roundTypes = Object.keys(roundCounts).sort();
+  const counts = roundTypes.map(r => roundCounts[r]);
+  const colors = [ACCENT.blue, ACCENT.green, ACCENT.purple, ACCENT.yellow, ACCENT.cyan, ACCENT.pink, ACCENT.orange, ACCENT.red];
+
+  return new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: roundTypes.map(r => r.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())),
+      datasets: [{
+        data: counts,
+        backgroundColor: roundTypes.map((_, i) => colors[i % colors.length]),
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '55%',
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded', font: { size: 10 } } },
+      },
+    },
+  });
+}
+
+// --- Round Scores Horizontal Bar (avg score per round type) ---
+function renderRoundScoresChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !data || !data.entries) return null;
+
+  const roundTypes = [...new Set(data.entries.map(e => e.round_type || 'unknown'))].sort();
+
+  const avgScores = roundTypes.map(rt => {
+    const entries = data.entries.filter(e => (e.round_type || 'unknown') === rt);
+    if (entries.length === 0) return 0;
+    return parseFloat((entries.reduce((sum, e) => sum + e.score, 0) / entries.length).toFixed(2));
+  });
+
+  const passRates = roundTypes.map(rt => {
+    const entries = data.entries.filter(e => (e.round_type || 'unknown') === rt);
+    if (entries.length === 0) return 0;
+    const hires = entries.filter(e => e.decision === 'hire' || e.decision === 'strong_hire').length;
+    return Math.round((hires / entries.length) * 100);
+  });
+
+  const barColors = avgScores.map(s => {
+    if (s >= 3.5) return ACCENT.green;
+    if (s >= 2.5) return ACCENT.yellow;
+    return ACCENT.red;
+  });
+
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: roundTypes.map(r => r.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())),
+      datasets: [
+        {
+          label: 'Avg Score',
+          data: avgScores,
+          backgroundColor: barColors,
+          borderRadius: 6,
+          borderSkipped: false,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Pass Rate %',
+          data: passRates,
+          type: 'line',
+          borderColor: ACCENT.blue,
+          backgroundColor: 'rgba(79,143,255,0.1)',
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: ACCENT.blue,
+          tension: 0.3,
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label === 'Pass Rate %' ? `Pass Rate: ${ctx.raw}%` : `Avg Score: ${ctx.raw}/5`,
+          },
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#a0a0b0', font: { size: 11 } } },
+        y: { grid: { color: '#1a1a2e' }, ticks: { color: '#a0a0b0' }, beginAtZero: true, max: 5, title: { display: true, text: 'Avg Score', color: '#6b6b7b', font: { size: 10 } } },
+        y1: { position: 'right', grid: { display: false }, ticks: { color: ACCENT.blue, callback: v => v + '%' }, min: 0, max: 100, title: { display: true, text: 'Pass Rate', color: ACCENT.blue, font: { size: 10 } } },
       },
     },
   });

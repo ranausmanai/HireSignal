@@ -1,167 +1,191 @@
-# 📊 Interview Insights
+# 🎯 HireSignal
+### *Turn interview feedback into hiring intelligence*
 
-**Visual feedback analyzer for engineering hiring teams.**
-
-Ingest interview feedback from text files, CSVs, or pasted text — and instantly see beautiful, interactive dashboards that reveal calibration gaps, interviewer biases, and hiring inconsistencies.
-
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://python.org)
-[![Flask](https://img.shields.io/badge/flask-2.3%2B-000?logo=flask&logoColor=white)](https://flask.palletsprojects.com)
-[![Chart.js](https://img.shields.io/badge/chart.js-4.x-ff6384?logo=chartdotjs&logoColor=white)](https://www.chartjs.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+HireSignal reads your interview notes and PDFs, and turns them into clear visual insights — who your best interviewers are, where your hiring bar sits, and why candidates pass or fail. No spreadsheets. No manual analysis. Just answers.
 
 ---
 
-## 📸 Screenshots
+## ✨ What It Does
 
-> *Dashboard loads instantly with 50 sample feedback entries — all charts populated out of the box.*
-
-| Dashboard | Upload |
-|-----------|--------|
-| ![Dashboard](https://via.placeholder.com/600x400/0a0a0f/4f8fff?text=Dashboard) | ![Upload](https://via.placeholder.com/600x400/0a0a0f/4f8fff?text=Upload+%26+Paste) |
+| Question | Where to find it |
+|----------|-----------------|
+| How different are our interviewers in style and strictness? | **Interview Team** page |
+| Does our take-home predict how someone does in the tech interview? | **Insights** → Cross-Round Correlation |
+| Where is our hiring bar? | **Insights** → Score by Round Type |
+| What are the most common reasons candidates fail? | **Insights** → Positive & Negative Reasons |
+| Ask anything about your hiring data | **Copilot** → AI Chat |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
+
+### What you need
+- A Mac or Windows/Linux computer
+- Python installed ([download here](https://www.python.org/downloads/) if you don't have it — get version 3.9 or newer)
+- Your interview feedback as PDF files, text files, or CSV exports
+
+> **That's it.** No accounts, no cloud setup, no API keys needed to get started.
+
+---
+
+### Step 1 — Download the app
+
+Click the green **Code** button at the top of this page → **Download ZIP** → unzip it somewhere on your computer (e.g. your Desktop or Documents folder).
+
+---
+
+### Step 2 — Start the app
+
+**On Mac:**
+1. Open the Terminal app (search for "Terminal" in Spotlight)
+2. Type `cd ` (with a space after), then drag the HireSignal folder into the Terminal window and press Enter
+3. Type `./start.sh` and press Enter
+
+**On Windows:**
+1. Open the folder in File Explorer
+2. Double-click `start.sh` (if you have Git Bash installed) or open Command Prompt, navigate to the folder, and run `python app.py`
+
+The first time it runs, it will install a few things automatically — this takes about 1 minute. After that it opens in your browser automatically.
+
+> 🌐 The app runs at **http://localhost:8021** — bookmark it!
+
+---
+
+### Step 3 — Add your feedback
+
+1. Click **Add Feedback** in the left sidebar
+2. Drag and drop your PDF files (interview scorecards, feedback exports) onto the upload area
+3. Wait for the AI to read and structure the data — you'll see a live progress message
+4. Once done, the dashboard populates automatically
+
+**Supported formats:** PDF, plain text (.txt), CSV, JSON, Markdown
+
+> ⏱️ A 10-page PDF takes about 1–2 minutes to process. Larger files take longer.
+
+---
+
+## 📖 Page Guide
+
+### 🏠 Overview
+Your hiring command center. See total candidates reviewed, pass rates, score trends over time, and which interviewers need attention.
+
+### 👥 Interview Team
+One card per interviewer. Shows their average score, pass rate, style tags (e.g. "detail-oriented", "big-picture"), and how they compare to each other. Use the **Compare** section at the bottom to put two interviewers side by side.
+
+### 🔭 Role Pipelines
+Breakdown by job role. See which pipelines are healthy (high pass rate, consistent scores) and which are problematic (low pass rate, lots of negative feedback).
+
+### 💡 Insights
+The most important page for answering leadership questions:
+- **Top reasons** candidates pass or fail
+- **Which reasons** actually correlate with hire/no-hire decisions
+- **Score by round type** — how take-home, tech interview, and culture fit compare
+- **Cross-round correlation** — does someone who does well in take-home also do well in the tech interview?
+
+### 🤖 Copilot
+Ask questions in plain English:
+- *"Which interviewer is the strictest?"*
+- *"What are the top reasons candidates fail the tech interview?"*
+- *"Summarise the hiring trends from last month"*
+
+You can also generate a **presentation deck** from the Copilot page — hit "Generate Deck" and it builds slides you can share with your team.
+
+### ⚙️ Data Sources
+Where your data comes from. Upload PDFs here, or connect to **Greenhouse ATS** (paste your API key to sync scorecards directly — or type `mock` to see a live demo).
+
+---
+
+## 🔌 Connecting to Greenhouse (Optional)
+
+If your company uses Greenhouse for applicant tracking:
+
+1. Go to **Data Sources** in the left sidebar
+2. Under **Greenhouse ATS**, paste your Harvest API key
+3. Click **Connect**
+4. Data syncs automatically — no more manual exports
+
+> Don't have an API key? Ask your Greenhouse admin. It's under *Configure → Dev Center → API Credential Management*.
+
+---
+
+## 🤖 AI Features
+
+HireSignal uses AI to:
+- Parse unstructured PDF feedback into structured data
+- Answer questions about your hiring data in the Copilot
+- Generate presentation decks
+
+By default it uses **Claude Code** (Anthropic's AI CLI). If you have it installed, everything just works.
+
+**Don't have Claude Code?** You can also use:
+- **Codex CLI** (OpenAI)
+- **Local models via Ollama** — runs 100% on your computer, no internet needed
+
+Switch between them in **Data Sources → AI Backend**.
+
+> 💡 If no AI is available, PDF uploads fall back to a simpler text parser — it still works, just less accurately.
+
+---
+
+## 📁 Your Data & Privacy
+
+Everything stays on your computer. HireSignal does not send your feedback data to any server or cloud service. The only external calls are to the AI tool you choose (Claude/Codex) for parsing and answering questions — and even that can be replaced with a fully local Ollama model.
+
+Data is stored in the `data/` folder inside the app directory:
+- `data/uploads/` — your uploaded files
+- `data/sessions/` — saved snapshots
+- `data/decks/` — generated presentation decks
+
+---
+
+## 🛠️ Troubleshooting
+
+**The app won't start**
+- Make sure Python 3.9+ is installed: open Terminal and type `python3 --version`
+- Try running `pip install -r requirements.txt` manually in the app folder
+
+**PDF upload seems stuck**
+- Large PDFs (10+ pages) can take 3–5 minutes with a local AI model
+- Watch the status message on the Add Feedback page — it updates every few seconds
+- If it fails, try splitting the PDF into smaller chunks
+
+**The dashboard shows no data after upload**
+- Click the reset button (↻) at the bottom of the sidebar and re-upload
+- Check you're viewing "All datasets" in Data Sources
+
+**Port 8021 already in use**
+- Run `start.sh` again — it automatically stops the old instance and restarts
+
+---
+
+## 💻 For Developers
 
 ```bash
-# Clone the repo
-git clone https://github.com/your-org/interview-insights.git
-cd interview-insights
-
-# Install dependencies
+# Clone and run
+git clone https://github.com/ranausmanai/hiresignal.git
+cd hiresignal
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-# Run the server
-python3 app.py
-
-# Open in browser
-open http://localhost:8000
+python app.py
 ```
 
-That's it. The app loads with built-in sample data — all charts are live immediately.
+**Stack:** Python 3.9+ · Flask · Chart.js 4.4 · Vanilla JS · Claude/Codex/Ollama for LLM
 
----
-
-## ✨ Features
-
-### 📥 Feedback Ingestion
-- **Drag & drop** `.txt`, `.csv`, `.json`, `.md` files
-- **Paste mode** for quick text input
-- Smart parsing extracts interviewer, candidate, role, decision, score, themes, sentiment, and date
-- Handles diverse formats with fuzzy column matching and regex extraction
-
-### 📊 Interactive Dashboard
-- **Interviewer Calibration Heatmap** — Spot who's too harsh or too lenient, broken down by role
-- **Decision Distribution** — Stacked bar chart showing hire/no-hire/maybe breakdown per role
-- **Interviewer Agreement Matrix** — Pairwise agreement rates when two interviewers evaluate the same candidate
-- **Score Distribution** — Grouped bar chart revealing each interviewer's scoring patterns
-- **Theme Frequency Radar** — Spider chart of evaluation themes (technical, communication, culture fit, etc.)
-- **Sentiment Over Time** — Monthly sentiment trend line with gradient fill
-- **Consistency Gauge** — The centerpiece: a 0-100 score for how calibrated your hiring bar is
-- **Word Cloud** — Most frequent feedback terms, sized by frequency
-- **Red Flags Panel** — Auto-detected calibration concerns with severity ratings
-
-### 🔍 Drill-down & Filtering
-- Filter all charts by role, interviewer, date range, or decision outcome
-- Click any data point to see the actual feedback entries behind it
-- Compare two interviewers side-by-side on the Interviewers page
-
-### 📋 Executive Summary
-- Auto-generated summary with key stats and top 3 actionable insights
-- No external APIs — all analysis runs locally with heuristics
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    Browser (SPA)                     │
-│  ┌──────────┐  ┌──────────┐  ┌───────────────────┐  │
-│  │ app.js   │  │ charts.js│  │   Chart.js (CDN)  │  │
-│  │ routing, │  │ 9 chart  │  │   rendering       │  │
-│  │ upload,  │  │ renderers│  │   engine           │  │
-│  │ filters  │  │          │  │                    │  │
-│  └────┬─────┘  └──────────┘  └───────────────────┘  │
-│       │                                              │
-│       │  fetch /api/data, /api/upload, /api/paste    │
-└───────┼──────────────────────────────────────────────┘
-        │
-        ▼
-┌───────────────────────────────────────────────────┐
-│                Flask Server (app.py)               │
-│                                                    │
-│  ┌────────────┐  ┌─────────────┐  ┌────────────┐  │
-│  │  Parsers   │  │  Analytics  │  │  In-Memory │  │
-│  │  CSV/JSON/ │──▶  Engine     │──▶  Store +   │  │
-│  │  TXT/MD    │  │  (compute)  │  │  sample.json│  │
-│  └────────────┘  └─────────────┘  └────────────┘  │
-│                                                    │
-│  Parsers:         Analytics:                       │
-│  • Fuzzy CSV      • Per-interviewer stats          │
-│    column match   • Agreement matrix               │
-│  • Flexible JSON  • Consistency score (0-100)      │
-│    field mapping  • Red flag detection             │
-│  • Regex text     • Theme frequencies              │
-│    extraction     • Sentiment timeline             │
-│  • Keyword-based  • Word frequencies               │
-│    theme detect   • Executive summary generation   │
-└───────────────────────────────────────────────────┘
+**Environment variables (all optional):**
+```bash
+INTERVIEW_INSIGHTS_LLM_BACKEND=claude     # claude | codex | ollama
+INTERVIEW_INSIGHTS_CODEX_MODEL=gpt-5.3-codex
+INTERVIEW_INSIGHTS_CODEX_REASONING=medium
+INTERVIEW_INSIGHTS_OLLAMA_MODEL=qwen3.5:0.8b
+FLASK_DEBUG=1                             # dev only
 ```
 
 ---
 
-## 📁 Project Structure
+## 📄 License
 
-```
-interview-insights/
-├── app.py                  # Flask server, API routes, parsers, analytics
-├── requirements.txt        # Python dependencies (Flask)
-├── templates/
-│   └── index.html          # SPA shell with sidebar, pages, modal
-├── static/
-│   ├── css/
-│   │   └── style.css       # Dark theme (Grafana-meets-Linear aesthetic)
-│   └── js/
-│       ├── app.js          # Page routing, uploads, filters, data fetching
-│       └── charts.js       # 9 chart rendering functions
-├── data/
-│   └── sample.json         # 50 pre-loaded interview feedback entries
-└── README.md
-```
+MIT — free to use, modify, and share.
 
 ---
 
-## 📄 Supported Input Formats
-
-| Format | How it's parsed |
-|--------|----------------|
-| **CSV** | Auto-detects columns by fuzzy header matching (interviewer, candidate, role, score, etc.) |
-| **JSON** | Accepts arrays of objects with flexible field names |
-| **TXT/MD** | Regex extraction for labeled fields (`Interviewer:`, `Score:`, etc.) and keyword-based theme/decision detection |
-
----
-
-## 🎨 Design
-
-- **Dark theme**: `#0a0a0f` background, `#12121a` cards, subtle `#1a1a2e` borders
-- **Accent palette**: Blue `#4f8fff`, Green `#34d399`, Red `#ef4444`, Yellow `#fbbf24`, Purple `#a78bfa`
-- **Typography**: System font stack, large bold KPI numbers, uppercase chart labels
-- **Animations**: 800ms chart transitions, hover lift on cards, pulsing upload border
-- **Responsive**: 2-column grid on desktop, single column on mobile, collapsible sidebar
-
----
-
-## 🧪 Sample Data
-
-The included `data/sample.json` contains 50 realistic feedback entries with:
-- **8 interviewers** with distinct calibration patterns (Sarah Chen is tough, Mike Johnson is lenient)
-- **25 candidates** across 5 roles
-- **Deliberate disagreements** between interviewer pairs for interesting agreement matrices
-- **Varied scores, themes, and sentiments** spread across 12 months
-
----
-
-## 📝 License
-
-MIT
+*Built for hiring teams who want signal, not noise.* 🎯
