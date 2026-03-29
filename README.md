@@ -1,184 +1,446 @@
-# 🎯 HireSignal
-### *Turn interview feedback into hiring intelligence*
+<p align="center">
+  <img src="static/favicon.svg" width="80" alt="HireSignal Logo" />
+</p>
 
-HireSignal reads your interview notes and PDFs, and turns them into clear visual insights — who your best interviewers are, where your hiring bar sits, and why candidates pass or fail. No spreadsheets. No manual analysis. Just answers.
+<h1 align="center">🎯 HireSignal</h1>
 
----
+<p align="center">
+  <strong>Turn interview feedback into hiring intelligence</strong><br/>
+  <em>Built for recruiters. Powered by AI. Runs on your laptop.</em>
+</p>
 
-## ✨ What It Does
-
-| Question | Where to find it |
-|----------|-----------------|
-| How different are our interviewers in style and strictness? | **Interview Team** page |
-| Does our take-home predict how someone does in the tech interview? | **Insights** → Cross-Round Correlation |
-| Where is our hiring bar? | **Insights** → Score by Round Type |
-| What are the most common reasons candidates fail? | **Insights** → Positive & Negative Reasons |
-| Ask anything about your hiring data | **Copilot** → AI Chat |
-
----
-
-## 🚀 Getting Started
-
-### What you need
-- A Mac or Windows/Linux computer
-- Python installed ([download here](https://www.python.org/downloads/) if you don't have it — get version 3.9 or newer)
-- Your interview feedback as PDF files, text files, or CSV exports
-
-> **That's it.** No accounts, no cloud setup, no API keys needed to get started.
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> ·
+  <a href="#-features">Features</a> ·
+  <a href="#-complete-installation-guide">Installation</a> ·
+  <a href="#-page-by-page-guide">Page Guide</a> ·
+  <a href="#-for-developers">Developer Docs</a>
+</p>
 
 ---
 
-### Step 1 — Download the app
+## 🧐 What is HireSignal?
 
-Click the green **Code** button at the top of this page → **Download ZIP** → unzip it somewhere on your computer (e.g. your Desktop or Documents folder).
+HireSignal is a tool that **reads your interview feedback** — PDFs, exported notes, pasted text, or Greenhouse scorecards — and gives you **clear, visual answers** to the questions hiring managers actually ask:
 
----
+> *"Are our interviewers calibrated?"*
+> *"What's our hiring bar?"*
+> *"Why are candidates failing?"*
 
-### Step 2 — Start the app
+You drop in your feedback files, and HireSignal does the rest — no spreadsheets, no manual tagging, no data cleanup.
 
-**On Mac:**
-1. Open the Terminal app (search for "Terminal" in Spotlight)
-2. Type `cd ` (with a space after), then drag the HireSignal folder into the Terminal window and press Enter
-3. Type `./start.sh` and press Enter
-
-**On Windows:**
-1. Open the folder in File Explorer
-2. Double-click `start.sh` (if you have Git Bash installed) or open Command Prompt, navigate to the folder, and run `python app.py`
-
-The first time it runs, it will install a few things automatically — this takes about 1 minute. After that it opens in your browser automatically.
-
-> 🌐 The app runs at **http://localhost:8021** — bookmark it!
+### 🔒 Privacy First
+Everything runs **locally on your computer**. Your candidate data never leaves your machine. No cloud accounts needed.
 
 ---
 
-### Step 3 — Add your feedback
+## ⚡ Quick Start
 
-1. Click **Add Feedback** in the left sidebar
-2. Drag and drop your PDF files (interview scorecards, feedback exports) onto the upload area
-3. Wait for the AI to read and structure the data — you'll see a live progress message
-4. Once done, the dashboard populates automatically
+If you just want to get it running (details below):
 
-**Supported formats:** PDF, plain text (.txt), CSV, JSON, Markdown
+```bash
+git clone https://github.com/ranausmanai/HireSignal.git
+cd HireSignal
+./start.sh
+```
 
-> ⏱️ A 10-page PDF takes about 1–2 minutes to process. Larger files take longer.
+That's it. It installs everything, opens your browser, and you're ready to upload feedback.
 
 ---
 
-## 📖 Page Guide
+## ✨ Features
+
+### 📊 Six Pages of Insight
+
+| Page | What you get |
+|------|-------------|
+| 🏠 **Overview** | Hiring command center — pass rates, score trends, candidates needing attention |
+| 📄 **Add Feedback** | Drop PDFs or paste raw notes — AI structures them automatically |
+| 👥 **Interview Team** | Per-interviewer cards with style tags, score patterns, side-by-side comparison |
+| 🔭 **Role Pipelines** | Health check per job role — pass rates, blockers, pipeline friction |
+| 💡 **Insights** | Cross-round correlation, reason analysis, hiring bar visualization |
+| 🤖 **Copilot** | Ask questions in English, generate shareable slide decks |
+
+### 🧠 AI-Powered
+
+- 📝 **PDF Parsing** — Drop a 10-page feedback PDF, get structured data in 1–2 minutes
+- 💬 **Copilot Chat** — Ask *"Who is our strictest interviewer?"* and get a real answer
+- 📊 **Deck Generator** — Create leadership briefing slides with one click
+- 🔄 **3 AI backends** — Claude Code, Codex CLI, or fully local via Ollama (no internet)
+
+### 🔌 Data Sources
+
+- **PDF / Text / CSV / JSON** — upload anything, AI figures out the structure
+- **Greenhouse ATS** — connect with your Harvest API key to sync scorecards directly
+- **Mock data** — type `mock` in the Greenhouse field to explore with sample data
+
+---
+
+## 📦 Complete Installation Guide
+
+### Prerequisites
+
+You need **one thing**: Python 3.9 or newer.
+
+<details>
+<summary>🍎 <strong>How to check if you have Python (Mac)</strong></summary>
+
+1. Press `Cmd + Space` to open Spotlight
+2. Type **Terminal** and press Enter
+3. In the Terminal window, type this and press Enter:
+   ```
+   python3 --version
+   ```
+4. If you see something like `Python 3.11.5` — you're good! Skip to the next section.
+5. If you see `command not found` — you need to install Python:
+   - Go to [python.org/downloads](https://www.python.org/downloads/)
+   - Click the big yellow **Download Python** button
+   - Open the downloaded file and follow the installer
+   - When it's done, **close Terminal and reopen it**, then try `python3 --version` again
+
+</details>
+
+<details>
+<summary>🪟 <strong>How to check if you have Python (Windows)</strong></summary>
+
+1. Press `Win + R`, type `cmd`, press Enter
+2. Type this and press Enter:
+   ```
+   python --version
+   ```
+3. If you see `Python 3.x.x` — you're good!
+4. If not:
+   - Go to [python.org/downloads](https://www.python.org/downloads/)
+   - Download and run the installer
+   - ⚠️ **IMPORTANT:** Check the box that says **"Add Python to PATH"** during installation
+   - Close and reopen Command Prompt, try `python --version` again
+
+</details>
+
+---
+
+### Option A — Download as ZIP (easiest, no git needed)
+
+1. Click the green **< > Code** button at the top of this GitHub page
+2. Click **Download ZIP**
+3. Unzip the downloaded file — you'll get a folder called `HireSignal-main`
+4. Move it somewhere convenient (Desktop, Documents, etc.)
+
+Now follow the **"Running the App"** section below.
+
+---
+
+### Option B — Clone with Git (for developers)
+
+```bash
+git clone https://github.com/ranausmanai/HireSignal.git
+cd HireSignal
+```
+
+---
+
+### Running the App
+
+#### 🍎 Mac / 🐧 Linux
+
+1. Open **Terminal**
+2. Navigate to the HireSignal folder. The easiest way:
+   - Type `cd ` (with a space after the `cd`)
+   - **Drag the HireSignal folder** from Finder into the Terminal window
+   - Press **Enter**
+3. Run the start script:
+   ```bash
+   ./start.sh
+   ```
+4. The script will:
+   - ✅ Check your Python version
+   - ✅ Create a virtual environment (first time only)
+   - ✅ Install all dependencies (first time only)
+   - ✅ Start the app
+   - ✅ Open your browser automatically
+
+> 💡 **First run** takes about 60 seconds (downloading dependencies). After that, it starts in ~3 seconds.
+
+#### 🪟 Windows
+
+1. Open **Command Prompt** (press `Win + R`, type `cmd`, press Enter)
+2. Navigate to the HireSignal folder:
+   ```
+   cd C:\Users\YourName\Desktop\HireSignal-main
+   ```
+   (Replace with the actual path to where you put the folder)
+3. Set up the environment (first time only):
+   ```
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+4. Start the app:
+   ```
+   python app.py
+   ```
+5. Open your browser and go to **http://localhost:8021**
+
+---
+
+### 🎉 You should see...
+
+Your browser opens to **http://localhost:8021** with a dark-themed dashboard. The sidebar on the left has all the pages. The first time, the dashboard will be empty — that's normal! You need to upload your feedback data first.
+
+To stop the app, go back to Terminal and press **Ctrl + C**.
+
+---
+
+## 📖 Page-by-Page Guide
 
 ### 🏠 Overview
-Your hiring command center. See total candidates reviewed, pass rates, score trends over time, and which interviewers need attention.
+
+The landing page. Shows:
+- **Total candidates** reviewed and overall pass rate
+- **Score distribution** — how scores spread across 1–5
+- **Timeline** — trends over time
+- **Attention alerts** — interviewers or candidates that need review
+
+> 💡 This is your "glance at the morning" page.
+
+---
+
+### 📄 Add Feedback
+
+This is where data gets into HireSignal.
+
+**To upload files:**
+1. Click **Add Feedback** in the sidebar
+2. Drag and drop your files onto the upload area (or click to browse)
+3. A progress message appears: *"AI is reading the PDF — this takes 1–2 minutes…"*
+4. When done, it says *"Done — 28 entries added"*
+5. Go to **Overview** — your dashboard is now populated
+
+**Supported file types:** `.pdf` `.txt` `.csv` `.json` `.md`
+
+**To paste raw text:**
+1. Click the **Paste Text** tab
+2. Paste your interview notes directly
+3. Click **Submit Feedback**
+
+> ⏱️ **Speed guide:** A 5-page PDF takes ~1 minute with Claude, ~3 minutes with a local Ollama model.
+
+---
 
 ### 👥 Interview Team
-One card per interviewer. Shows their average score, pass rate, style tags (e.g. "detail-oriented", "big-picture"), and how they compare to each other. Use the **Compare** section at the bottom to put two interviewers side by side.
+
+One card for each interviewer showing:
+- 📊 **Average score** they give (are they harsh or lenient?)
+- ✅ **Pass rate** (what percentage of their candidates pass?)
+- 🏷️ **Style tags** — automatically detected (e.g. "detail-oriented", "values communication")
+- 📋 **Top reasons** they cite in positive and negative feedback
+
+**Compare mode:** Scroll to the bottom, pick two interviewers from the dropdowns, and see them side by side — useful for calibration discussions.
+
+---
 
 ### 🔭 Role Pipelines
-Breakdown by job role. See which pipelines are healthy (high pass rate, consistent scores) and which are problematic (low pass rate, lots of negative feedback).
+
+Grouped by job role (e.g. "PHP Developer", "Senior PHP Developer"):
+- Which roles have healthy pipelines (good pass rate, consistent scores)
+- Which roles have friction (high rejection, repeated issues)
+- The most common feedback themes per role
+
+---
 
 ### 💡 Insights
-The most important page for answering leadership questions:
-- **Top reasons** candidates pass or fail
-- **Which reasons** actually correlate with hire/no-hire decisions
-- **Score by round type** — how take-home, tech interview, and culture fit compare
-- **Cross-round correlation** — does someone who does well in take-home also do well in the tech interview?
+
+The deepest page. Answers leadership questions directly:
+
+**📌 Top Positive & Negative Reasons**
+What comes up most often in positive feedback ("strong technical knowledge") and negative feedback ("gaps in fundamentals").
+
+**📌 Reason Impact**
+Which specific reasons actually correlate with hire vs. no-hire decisions — not just frequency, but impact.
+
+**📌 Score by Round Type**
+Average scores and pass rates for each interview round type (take-home, tech interview, culture fit, etc.). Shows where the **hiring bar** sits per round.
+
+**📌 Cross-Round Correlation** *(the big one)*
+A matrix showing each candidate's score and decision across different round types. If someone scores a 5 on the take-home but a 2 in the tech interview, that row lights up red. Shows whether your rounds are aligned or contradicting each other.
+
+**📌 Round Pair Summary**
+Agreement rates between pairs of round types. *"Take-home and tech interview agree 60% of the time across 5 shared candidates."*
+
+---
 
 ### 🤖 Copilot
-Ask questions in plain English:
-- *"Which interviewer is the strictest?"*
-- *"What are the top reasons candidates fail the tech interview?"*
-- *"Summarise the hiring trends from last month"*
 
-You can also generate a **presentation deck** from the Copilot page — hit "Generate Deck" and it builds slides you can share with your team.
+Two features in one page:
+
+**💬 Chat**
+Type any question in plain English:
+- *"Which interviewer is the strictest?"*
+- *"What are the top 3 reasons candidates fail?"*
+- *"Compare Jan's feedback style to Ondrej's"*
+- *"What does the data say about our hiring bar?"*
+
+The AI has full context of all your uploaded data.
+
+**📊 Deck Generator**
+Click **Generate Deck** to create a presentation-ready HTML slide deck. Great for sharing with leadership. Choose a topic (e.g. *"Interviewer Calibration Brief"*) and it generates a complete deck with charts and findings.
+
+Generated decks are saved and can be accessed later from the deck library.
+
+---
 
 ### ⚙️ Data Sources
-Where your data comes from. Upload PDFs here, or connect to **Greenhouse ATS** (paste your API key to sync scorecards directly — or type `mock` to see a live demo).
+
+Three sections:
+
+**1. Source Cards** — PDF Upload (links to Add Feedback page) and Greenhouse ATS (enter API key to connect)
+
+**2. AI Backend** — Switch between:
+- ⚡ **Claude Code** — fastest and most accurate (needs [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed)
+- 🚀 **Codex CLI** — OpenAI alternative
+- 🏠 **Local (Ollama)** — fully offline, runs on your machine (needs [Ollama](https://ollama.com/) installed)
+
+**3. Your Datasets** — Manage uploaded datasets, compare them, delete old ones
 
 ---
 
-## 🔌 Connecting to Greenhouse (Optional)
+## 🔌 Greenhouse ATS Integration
 
-If your company uses Greenhouse for applicant tracking:
+If your company uses Greenhouse:
 
-1. Go to **Data Sources** in the left sidebar
-2. Under **Greenhouse ATS**, paste your Harvest API key
-3. Click **Connect**
-4. Data syncs automatically — no more manual exports
+1. Get your **Harvest API key** from Greenhouse:
+   - Go to Greenhouse → *Configure* → *Dev Center* → *API Credential Management*
+   - Create a new key with **Harvest** permissions
+2. In HireSignal, go to **Data Sources**
+3. Paste the key under **Greenhouse ATS** → click **Connect**
+4. Click **Sync Latest** to pull in new scorecards
 
-> Don't have an API key? Ask your Greenhouse admin. It's under *Configure → Dev Center → API Credential Management*.
-
----
-
-## 🤖 AI Features
-
-HireSignal uses AI to:
-- Parse unstructured PDF feedback into structured data
-- Answer questions about your hiring data in the Copilot
-- Generate presentation decks
-
-By default it uses **Claude Code** (Anthropic's AI CLI). If you have it installed, everything just works.
-
-**Don't have Claude Code?** You can also use:
-- **Codex CLI** (OpenAI)
-- **Local models via Ollama** — runs 100% on your computer, no internet needed
-
-Switch between them in **Data Sources → AI Backend**.
-
-> 💡 If no AI is available, PDF uploads fall back to a simpler text parser — it still works, just less accurately.
-
----
-
-## 📁 Your Data & Privacy
-
-Everything stays on your computer. HireSignal does not send your feedback data to any server or cloud service. The only external calls are to the AI tool you choose (Claude/Codex) for parsing and answering questions — and even that can be replaced with a fully local Ollama model.
-
-Data is stored in the `data/` folder inside the app directory:
-- `data/uploads/` — your uploaded files
-- `data/sessions/` — saved snapshots
-- `data/decks/` — generated presentation decks
+> 🧪 **Want to try it first?** Type `mock` as the API key to load sample Greenhouse data.
 
 ---
 
 ## 🛠️ Troubleshooting
 
-**The app won't start**
-- Make sure Python 3.9+ is installed: open Terminal and type `python3 --version`
-- Try running `pip install -r requirements.txt` manually in the app folder
+<details>
+<summary><strong>❌ "Python is not installed" or "command not found"</strong></summary>
 
-**PDF upload seems stuck**
-- Large PDFs (10+ pages) can take 3–5 minutes with a local AI model
-- Watch the status message on the Add Feedback page — it updates every few seconds
-- If it fails, try splitting the PDF into smaller chunks
+Download Python 3.9+ from [python.org/downloads](https://www.python.org/downloads/). On Windows, make sure to check **"Add Python to PATH"** during installation. After installing, close and reopen your terminal.
+</details>
 
-**The dashboard shows no data after upload**
-- Click the reset button (↻) at the bottom of the sidebar and re-upload
-- Check you're viewing "All datasets" in Data Sources
+<details>
+<summary><strong>❌ "./start.sh: Permission denied"</strong></summary>
 
-**Port 8021 already in use**
-- Run `start.sh` again — it automatically stops the old instance and restarts
+Run this once:
+```bash
+chmod +x start.sh
+./start.sh
+```
+</details>
+
+<details>
+<summary><strong>❌ PDF upload says "Processing" but nothing happens</strong></summary>
+
+- Check which AI backend is active (bottom-left of sidebar). If it says "Not found", you need to install Claude Code, Codex, or Ollama.
+- Try switching to a different backend in Data Sources → AI Backend.
+- Large PDFs (10+ pages) take 3–5 minutes — watch the status message, it updates every 2 seconds.
+</details>
+
+<details>
+<summary><strong>❌ Dashboard is empty after uploading</strong></summary>
+
+- Click the ↻ reset button at the bottom of the sidebar, then re-upload
+- Make sure you're on the correct dataset in Data Sources
+</details>
+
+<details>
+<summary><strong>❌ "Port 8021 already in use"</strong></summary>
+
+Run `./start.sh` again — it automatically kills the old process. Or manually:
+```bash
+lsof -ti:8021 | xargs kill
+python app.py
+```
+</details>
+
+<details>
+<summary><strong>❌ Copilot / Chat is not responding</strong></summary>
+
+Copilot needs an AI backend. Check:
+- Is Claude Code installed? Run `claude --version` in Terminal
+- Or switch to Ollama: install from [ollama.com](https://ollama.com/), run `ollama pull qwen3.5:0.8b`, then switch backend in Data Sources
+</details>
 
 ---
 
 ## 💻 For Developers
 
+### Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.9+ · Flask |
+| Frontend | Vanilla JS · Chart.js 4.4 |
+| AI | Claude Code CLI · Codex CLI · Ollama (local) |
+| Data | In-memory (JSON persistence for sessions) |
+| ATS | Greenhouse Harvest API (real + mock) |
+
+### Project Structure
+
+```
+HireSignal/
+├── app.py                 # Flask backend (routes, analytics, LLM integration)
+├── mock_greenhouse.py     # Mock Greenhouse API data for demos
+├── start.sh               # One-click launcher (venv + deps + server)
+├── requirements.txt       # Python dependencies
+├── static/
+│   ├── favicon.svg        # App icon
+│   ├── css/style.css      # Full dark-theme stylesheet
+│   └── js/
+│       ├── app.js         # SPA logic, page rendering, API calls
+│       └── charts.js      # Chart.js configuration and chart builders
+├── templates/
+│   └── index.html         # Single-page app shell
+└── data/
+    ├── uploads/           # User-uploaded PDFs and files
+    ├── sessions/          # Saved data snapshots
+    └── decks/             # Generated HTML presentation decks
+```
+
+### Quick Dev Setup
+
 ```bash
-# Clone and run
-git clone https://github.com/ranausmanai/hiresignal.git
-cd hiresignal
-python -m venv .venv && source .venv/bin/activate
+git clone https://github.com/ranausmanai/HireSignal.git
+cd HireSignal
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python app.py
+python app.py                    # → http://localhost:8021
 ```
 
-**Stack:** Python 3.9+ · Flask · Chart.js 4.4 · Vanilla JS · Claude/Codex/Ollama for LLM
+### Environment Variables
 
-**Environment variables (all optional):**
-```bash
-INTERVIEW_INSIGHTS_LLM_BACKEND=claude     # claude | codex | ollama
-INTERVIEW_INSIGHTS_CODEX_MODEL=gpt-5.3-codex
-INTERVIEW_INSIGHTS_CODEX_REASONING=medium
-INTERVIEW_INSIGHTS_OLLAMA_MODEL=qwen3.5:0.8b
-FLASK_DEBUG=1                             # dev only
-```
+All optional. Set before running `python app.py`:
+
+| Variable | Default | Options |
+|----------|---------|---------|
+| `INTERVIEW_INSIGHTS_LLM_BACKEND` | `claude` | `claude` · `codex` · `ollama` |
+| `INTERVIEW_INSIGHTS_CODEX_MODEL` | `gpt-5.3-codex` | Any Codex model name |
+| `INTERVIEW_INSIGHTS_CODEX_REASONING` | `medium` | `low` · `medium` · `high` |
+| `INTERVIEW_INSIGHTS_OLLAMA_MODEL` | `qwen3.5:0.8b` | Any Ollama model tag |
+| `FLASK_DEBUG` | *(off)* | `1` to enable |
+
+### Key API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/data` | All entries + computed analytics |
+| POST | `/api/upload` | Upload files (returns job ID for async PDF processing) |
+| GET | `/api/upload/status/<id>` | Poll PDF parsing progress |
+| POST | `/api/chat` | Copilot chat |
+| POST | `/api/deck` | Generate presentation deck |
+| GET | `/api/llm/status` | Current AI backend + availability |
+| POST | `/api/llm/set` | Switch AI backend |
+| POST | `/api/greenhouse/connect` | Connect Greenhouse API |
 
 ---
 
@@ -188,4 +450,6 @@ MIT — free to use, modify, and share.
 
 ---
 
-*Built for hiring teams who want signal, not noise.* 🎯
+<p align="center">
+  <em>Built for hiring teams who want signal, not noise.</em> 🎯
+</p>
