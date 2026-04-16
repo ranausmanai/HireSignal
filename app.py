@@ -9,6 +9,7 @@ import math
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -3314,6 +3315,176 @@ def llm_set():
     llm_config["backend"] = backend
     llm_config["ollama_model"] = ollama_model
     return jsonify({"active": backend, "ollama_model": ollama_model})
+
+
+# ── Local AI (Ollama) one-click installer ─────────────────────────────────────
+
+local_ai_jobs = {}  # job_id -> {status, steps, log, error}
+
+
+def _ollama_installed():
+    import shutil
+    return shutil.which("ollama") is not None
+
+
+def _ollama_running():
+    try:
+        urllib_request.urlopen("http://localhost:11434/api/tags", timeout=2)
+        return True
+    except Exception:
+        return False
+
+
+def _ollama_has_model(model):
+    try:
+        req = urllib_request.Request("http://localhost:11434/api/tags")
+        with urllib_request.urlopen(req, timeout=3) as r:
+            data = json.loads(r.read())
+        names = [m.get("name", "") for m in data.get("models", [])]
+        # match exact or with :latest suffix
+        return any(n == model or n.startswith(model.split(":")[0]) for n in names)
+    except Exception:
+        return False
+
+
+def _run_install_job(job_id, model):
+    import shutil
+    job = local_ai_jobs[job_id]
+
+    def log(msg, step=None):
+        job["log"].append(msg)
+        if step:
+            job["step"] = step
+
+    def fail(msg):
+        job["log"].append("ERROR: " + msg)
+        job["status"] = "failed"
+        job["error"] = msg
+
+    try:
+        # ── Step 1: Install Ollama if missing ─────────────────────────────
+        if not _ollama_installed():
+            platform = sys.platform
+            log("Ollama not found — installing...", step="install_ollama")
+
+            if platform == "darwin":
+                if shutil.which("brew"):
+                    log("Running: brew install ollama")
+                    proc = subprocess.Popen(
+                        ["brew", "install", "ollama"],
+                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+                    )
+                    for line in proc.stdout:
+                        log(line.rstrip())
+                    proc.wait()
+                    if proc.returncode != 0:
+                        return fail("brew install ollama failed. Try installing manually.")
+                else:
+                    return fail(
+                        "Homebrew not found. Install Ollama manually from ollama.com, "
+                        "then come back and click Install again."
+                    )
+            elif platform.startswith("linux"):
+                log("Running Ollama install script...")
+                proc = subprocess.Popen(
+                    "curl -fsSL https://ollama.com/install.sh | sh",
+                    shell=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+                )
+                for line in proc.stdout:
+                    log(line.rstrip())
+                proc.wait()
+                if proc.returncode != 0:
+                    return fail("Ollama install script failed.")
+            else:
+                return fail(
+                    "Auto-install is only supported on macOS and Linux. "
+                    "On Windows, download Ollama from ollama.com and rerun."
+                )
+            log("Ollama installed.")
+        else:
+            log("Ollama already installed.")
+
+        # ── Step 2: Start Ollama service if not running ───────────────────
+        log("Checking Ollama service...", step="start_service")
+        if not _ollama_running():
+            log("Starting Ollama service...")
+            subprocess.Popen(
+                ["ollama", "serve"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                start_new_session=True
+            )
+            # wait up to 10s for it to respond
+            for _ in range(20):
+                time.sleep(0.5)
+                if _ollama_running():
+                    break
+            if not _ollama_running():
+                return fail("Ollama service didn't start in time. Try running 'ollama serve' manually.")
+        log("Ollama service is running.")
+
+        # ── Step 3: Pull model ────────────────────────────────────────────
+        if not _ollama_has_model(model):
+            log(f"Pulling model {model} (this may take a few minutes)...", step="pull_model")
+            proc = subprocess.Popen(
+                ["ollama", "pull", model],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            )
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    log(line)
+            proc.wait()
+            if proc.returncode != 0:
+                return fail(f"Failed to pull model {model}. Check the model name and try again.")
+            log(f"Model {model} ready.")
+        else:
+            log(f"Model {model} already available.")
+
+        # ── Step 4: Switch backend ────────────────────────────────────────
+        log("Switching backend to Ollama...", step="activate")
+        llm_config["backend"] = "ollama"
+        llm_config["ollama_model"] = model
+        log("Done! Local AI is ready.")
+        job["status"] = "done"
+
+    except Exception as exc:
+        fail(str(exc))
+
+
+@app.route("/api/local-ai/status")
+def local_ai_status():
+    model = llm_config.get("ollama_model", "qwen3.5:0.8b")
+    installed = _ollama_installed()
+    running = _ollama_running() if installed else False
+    has_model = _ollama_has_model(model) if running else False
+    return jsonify({
+        "ollama_installed": installed,
+        "ollama_running": running,
+        "model_available": has_model,
+        "model": model,
+        "platform": sys.platform,
+        "ready": installed and running and has_model,
+    })
+
+
+@app.route("/api/local-ai/install", methods=["POST"])
+def local_ai_install():
+    body = request.get_json(silent=True) or {}
+    model = str(body.get("model", llm_config.get("ollama_model", "qwen3.5:0.8b"))).strip()
+    job_id = str(uuid.uuid4())
+    local_ai_jobs[job_id] = {"status": "running", "step": "start", "log": [], "error": None}
+    t = threading.Thread(target=_run_install_job, args=(job_id, model), daemon=True)
+    t.start()
+    return jsonify({"job_id": job_id})
+
+
+@app.route("/api/local-ai/progress/<job_id>")
+def local_ai_progress(job_id):
+    job = local_ai_jobs.get(job_id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+    return jsonify(job)
 
 
 @app.route("/api/datasets")

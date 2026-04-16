@@ -3336,3 +3336,52 @@ details[open] > .ds-danger-toggle::before {
 .mt-16 { margin-top: 16px; }
 .mb-16 { margin-bottom: 16px; }
 .hidden { display: none !important; }
+
+/* ── Local AI setup ──────────────────────────────────── */
+.local-ai-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lai-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.lai-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-color);
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+.lai-dot.ok   { background: var(--accent-green); }
+.lai-dot.fail { background: var(--accent-red); }
+.lai-dot.spin { background: var(--accent-blue); animation: pulse 1s infinite alternate; }
+.lai-label  { color: var(--text-primary); min-width: 160px; }
+.lai-status { color: var(--text-muted); font-size: 13px; }
+.lai-ready-badge {
+  background: rgba(52,211,153,0.12);
+  color: var(--accent-green);
+  border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.local-ai-log {
+  margin-top: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  max-height: 220px;
+  overflow-y: auto;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

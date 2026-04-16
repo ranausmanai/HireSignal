@@ -1054,6 +1054,7 @@ function showSessionsStatus(msg, isError) {
 
 async function renderSettingsPage() {
   await checkLlmStatus();
+  checkLocalAIStatus();
   // Update PDF source status
   const pdfDot = document.getElementById('pdfStatusDot');
   const pdfText = document.getElementById('pdfStatusText');
@@ -2317,3 +2318,113 @@ document.getElementById('llmBackendRow')?.addEventListener('click', e => {
 document.getElementById('llmSaveModelBtn')?.addEventListener('click', () => {
   switchLlmBackend('ollama');
 });
+
+// ── Local AI one-click setup ──────────────────────────────────────────────────
+
+let _localAiPollTimer = null;
+
+async function checkLocalAIStatus() {
+  try {
+    const res = await fetch('/api/local-ai/status');
+    const d = await res.json();
+    renderLocalAIStatus(d);
+  } catch (_) {}
+}
+
+function renderLocalAIStatus(d) {
+  const set = (id, ok, text) => {
+    const dot = document.getElementById('laiDot' + id);
+    const status = document.getElementById('laiStatus' + id);
+    if (dot) { dot.className = 'lai-dot ' + (ok ? 'ok' : 'fail'); }
+    if (status) status.textContent = text;
+  };
+
+  set('Ollama',  d.ollama_installed, d.ollama_installed ? 'Installed' : 'Not installed');
+  set('Service', d.ollama_running,   d.ollama_running   ? 'Running'   : 'Not running');
+  set('Model',   d.model_available,  d.model_available  ? 'Downloaded': 'Not downloaded');
+
+  const nameEl = document.getElementById('laiModelName');
+  if (nameEl) nameEl.textContent = d.model || 'qwen3.5:0.8b';
+
+  const btn   = document.getElementById('localAiInstallBtn');
+  const badge = document.getElementById('laiReadyBadge');
+
+  if (d.ready) {
+    if (btn)   btn.style.display   = 'none';
+    if (badge) badge.style.display = 'inline-flex';
+  } else {
+    if (btn)   btn.style.display   = 'inline-flex';
+    if (badge) badge.style.display = 'none';
+  }
+}
+
+async function startLocalAIInstall() {
+  const btn = document.getElementById('localAiInstallBtn');
+  const log = document.getElementById('localAiLog');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Installing…'; }
+  if (log) { log.style.display = 'block'; log.textContent = ''; }
+
+  // Set checklist dots to spinning
+  ['Ollama','Service','Model'].forEach(id => {
+    const dot = document.getElementById('laiDot' + id);
+    if (dot) dot.className = 'lai-dot spin';
+  });
+
+  try {
+    const model = document.getElementById('llmOllamaModel')?.value?.trim() || 'qwen3.5:0.8b';
+    const res = await fetch('/api/local-ai/install', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model }),
+    });
+    const { job_id } = await res.json();
+    pollLocalAIInstall(job_id);
+  } catch (err) {
+    if (log) log.textContent += 'Failed to start install: ' + err.message + '\n';
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Set Up Local AI'; }
+  }
+}
+
+function pollLocalAIInstall(jobId) {
+  let lastLogLen = 0;
+  const log = document.getElementById('localAiLog');
+
+  _localAiPollTimer = setInterval(async () => {
+    try {
+      const res = await fetch('/api/local-ai/progress/' + jobId);
+      const job = await res.json();
+
+      // Append new log lines
+      if (log && job.log && job.log.length > lastLogLen) {
+        const newLines = job.log.slice(lastLogLen).join('\n');
+        log.textContent += newLines + '\n';
+        log.scrollTop = log.scrollHeight;
+        lastLogLen = job.log.length;
+      }
+
+      if (job.status === 'done') {
+        clearInterval(_localAiPollTimer);
+        await checkLocalAIStatus();
+        await checkLlmStatus();
+        const btn = document.getElementById('localAiInstallBtn');
+        if (btn) { btn.disabled = false; btn.textContent = '⚡ Set Up Local AI'; }
+      } else if (job.status === 'failed') {
+        clearInterval(_localAiPollTimer);
+        if (log) log.textContent += '\n' + (job.error || 'Install failed.') + '\n';
+        const btn = document.getElementById('localAiInstallBtn');
+        if (btn) { btn.disabled = false; btn.textContent = '⚡ Set Up Local AI'; }
+        ['Ollama','Service','Model'].forEach(id => {
+          const dot = document.getElementById('laiDot' + id);
+          if (dot && dot.classList.contains('spin')) dot.className = 'lai-dot fail';
+        });
+      }
+    } catch (_) {}
+  }, 800);
+}
+
+document.getElementById('localAiInstallBtn')?.addEventListener('click', startLocalAIInstall);
+
+// Check status whenever settings page is opened (hooked into renderSettingsPage)
+const _origRenderSettings = typeof renderSettingsPage === 'function' ? renderSettingsPage : null;
+// Also run on page load
+checkLocalAIStatus();

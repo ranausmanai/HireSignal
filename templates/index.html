@@ -645,6 +645,40 @@ Strong technical skills demonstrated during the coding exercise. Good communicat
         <div id="llmSwitchStatus" class="upload-status" style="margin-top:8px;"></div>
       </div>
 
+      <!-- Local AI one-click setup -->
+      <div class="ds-ai-section" id="localAiSection">
+        <h3 class="ds-section-label">Local AI Setup</h3>
+        <p style="color:var(--text-muted);font-size:13px;margin:0 0 16px;">
+          Run AI features entirely on your machine — no API keys, no internet, no data leaving your laptop.
+        </p>
+        <div class="local-ai-checklist" id="localAiChecklist">
+          <div class="lai-check" id="laiCheckOllama">
+            <span class="lai-dot" id="laiDotOllama"></span>
+            <span class="lai-label">Ollama</span>
+            <span class="lai-status" id="laiStatusOllama">checking…</span>
+          </div>
+          <div class="lai-check" id="laiCheckService">
+            <span class="lai-dot" id="laiDotService"></span>
+            <span class="lai-label">Ollama service</span>
+            <span class="lai-status" id="laiStatusService">checking…</span>
+          </div>
+          <div class="lai-check" id="laiCheckModel">
+            <span class="lai-dot" id="laiDotModel"></span>
+            <span class="lai-label">Model (<span id="laiModelName">qwen3.5:0.8b</span>)</span>
+            <span class="lai-status" id="laiStatusModel">checking…</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;">
+          <button class="btn btn-primary" id="localAiInstallBtn" style="display:none;">
+            &#9889; Set Up Local AI
+          </button>
+          <span class="lai-ready-badge" id="laiReadyBadge" style="display:none;">
+            &#10003; Local AI Ready — backend switched to Ollama
+          </span>
+        </div>
+        <div id="localAiLog" class="local-ai-log" style="display:none;"></div>
+      </div>
+
       <!-- Active datasets -->
       <div class="ds-datasets-section">
         <h3 class="ds-section-label">Your Datasets</h3>
