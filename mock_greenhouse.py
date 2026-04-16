@@ -1,4 +1,4 @@
-"""Mock Greenhouse ATS API — realistic interview feedback data for ShipMonk CZ Tech."""
+"""Mock Greenhouse ATS API — realistic interview feedback data for Nexora Logistics Tech."""
 
 from collections import defaultdict
 
@@ -7,598 +7,600 @@ def get_mock_greenhouse_data():
     """Returns realistic mock data as if from Greenhouse API.
 
     Generates 28 feedback entries across 6 interviewers and 11 candidates,
-    simulating ShipMonk's PHP Developer hiring pipeline with multiple round types.
+    simulating Nexora Logistics's Backend Engineer hiring pipeline with multiple round types.
     """
     return [
         # =====================================================================
-        # CANDIDATE 1: Martin Kolar — Aces take-home, bombs tech interview
+        # CANDIDATE 1: Ryan Foster — Aces take-home, bombs tech interview
         # =====================================================================
         {
             "id": 1001,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Martin Kolar",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Ryan Foster",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["technical_skills", "problem_solving", "coding_ability"],
             "sentiment": -0.6,
             "date": "2026-01-14",
             "feedback_text": (
-                "Technical interview was disappointing given the strength of the take-home submission. "
-                "Martin struggled significantly with live coding under pressure. When asked to implement "
-                "a simple repository pattern with Doctrine ORM, he could not articulate the difference "
-                "between EntityManager::persist() and EntityManager::flush(), which is fundamental. "
-                "His understanding of database indexes was superficial — he mentioned 'they make queries faster' "
-                "but couldn't explain B-tree structures, composite indexes, or when an index might hurt performance. "
-                "I suspect the take-home was completed with heavy AI assistance. His inability to explain "
-                "his own architectural decisions from the submitted code was concerning. Score: 2/5. "
-                "Decision: no hire."
+                "The technical interview was disappointing given the take-home submission. Ryan struggled "
+                "significantly with live coding under pressure. I asked him to walk through a basic "
+                "repository abstraction using an ORM — he couldn't explain the difference between "
+                "staging an object and committing changes to the database, which is foundational. "
+                "His knowledge of indexing was shallow: he said indexes make queries faster but "
+                "couldn't discuss tree-based structures, composite keys, or situations where an index "
+                "could hurt write performance. These are gaps you'd expect a mid-level engineer to "
+                "cover confidently. He was unable to justify several architectural choices from the "
+                "take-home when pressed — concerning given how polished the submission looked. "
+                "Score: 2/5. No hire."
             ),
             "round_type": "Technical Interview",
         },
         {
             "id": 1002,
-            "interviewer": "Matej Smisek",
-            "candidate": "Martin Kolar",
-            "role": "PHP Developer",
+            "interviewer": "Sam Rivera",
+            "candidate": "Ryan Foster",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["coding_ability", "technical_skills"],
             "sentiment": 0.7,
             "date": "2026-01-10",
             "feedback_text": (
-                "Take-home code review was solid. Martin submitted a clean Symfony application with "
-                "well-structured service layer, proper use of dependency injection, and reasonable test coverage. "
-                "The code follows PSR-12 standards and the README was thorough. He used Doctrine migrations "
-                "correctly and his entity relationships were well thought out. The API design was RESTful "
-                "with proper HTTP status codes and validation. A few minor issues: some services could "
-                "benefit from interface extraction, and error handling was inconsistent in places. "
-                "Overall a strong submission that demonstrates competence. Score: 4/5. Recommend hire."
+                "Ryan's take-home was genuinely solid. He submitted a well-structured web application "
+                "with a clean separation between the service layer and data access. Dependency injection "
+                "was used correctly throughout and test coverage was reasonable. The API followed REST "
+                "conventions with proper status codes and consistent response shapes. His README was "
+                "thorough and the code followed style guidelines throughout. A couple of things could "
+                "be improved: some service classes were doing too much and error handling was "
+                "inconsistent in a few spots. But overall this was a confident, competent submission. "
+                "Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1003,
-            "interviewer": "Jakub Talacko",
-            "candidate": "Martin Kolar",
-            "role": "PHP Developer",
+            "interviewer": "Jordan Chen",
+            "candidate": "Ryan Foster",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["communication", "culture_fit"],
             "sentiment": 0.1,
             "date": "2026-01-16",
             "feedback_text": (
-                "Culture fit round was mixed. Martin comes across as introverted and took a while to open up. "
-                "He showed genuine interest in ShipMonk's mission and asked thoughtful questions about our "
-                "warehouse automation challenges. However, I'm slightly concerned about how he'd fit into "
-                "our collaborative environment — he mentioned preferring to work independently and seemed "
-                "uncomfortable when I described our pair programming sessions. He was honest about his "
-                "weaknesses, which I appreciate. On the fence overall. He might thrive in the right sub-team."
+                "Culture fit was mixed. Ryan takes a while to warm up and is clearly more comfortable "
+                "working independently. He asked good questions about the product direction and seemed "
+                "genuinely interested in the logistics domain. My hesitation is around collaboration — "
+                "he mentioned that he finds pair programming draining and prefers async code reviews. "
+                "That's not disqualifying but it's worth discussing given how tightly our team works. "
+                "He was candid about his weaknesses, which I respect. On the fence. Could work well "
+                "in the right squad configuration. Score: 3/5."
             ),
             "round_type": "Culture Fit",
         },
 
         # =====================================================================
-        # CANDIDATE 2: Elena Svobodova — Strong across the board
+        # CANDIDATE 2: Priya Sharma — Strong across the board
         # =====================================================================
         {
             "id": 1004,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Elena Svobodova",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Priya Sharma",
+            "role": "Backend Engineer",
             "decision": "strong_hire",
             "score": 5,
             "themes": ["technical_skills", "system_design", "problem_solving"],
             "sentiment": 0.9,
             "date": "2026-02-05",
             "feedback_text": (
-                "Outstanding technical interview. Elena demonstrated deep knowledge across the entire PHP "
-                "ecosystem. Her explanation of PHP 8.3 fibers and how they compare to traditional async "
-                "patterns was excellent. She whiteboarded a clean microservices architecture for our "
-                "order processing pipeline, correctly identifying where to use message queues vs synchronous "
-                "calls. Her database knowledge is exceptional — she explained covering indexes, query plan "
-                "analysis with EXPLAIN, and even discussed InnoDB buffer pool tuning. When I pushed her on "
-                "Doctrine's Unit of Work pattern and identity map, she explained it with precision. "
-                "She also brought up DDD concepts like bounded contexts and aggregate roots organically. "
-                "This is exactly the caliber of engineer we need. Score: 5/5. Strong hire."
+                "Best technical interview I've conducted this quarter. Priya had deep, confident answers "
+                "across every area. She explained async concurrency patterns clearly, drew a clean "
+                "microservices architecture for our shipment tracking pipeline, and correctly identified "
+                "which communication patterns to use synchronously versus via a message queue. Her "
+                "database knowledge is exceptional — she walked through index internals, read EXPLAIN "
+                "output fluently, and even brought up buffer pool configuration unprompted. When I "
+                "pushed on ORM internals like the identity map and unit of work, she explained both "
+                "precisely. She also introduced domain-driven design concepts like bounded contexts and "
+                "aggregate roots naturally during the system design portion. This is exactly the level "
+                "we need. Score: 5/5. Strong hire."
             ),
             "round_type": "Technical Interview",
         },
         {
             "id": 1005,
-            "interviewer": "Ondrej Netik",
-            "candidate": "Elena Svobodova",
-            "role": "PHP Developer",
+            "interviewer": "Taylor Kim",
+            "candidate": "Priya Sharma",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["coding_ability", "technical_skills"],
             "sentiment": 0.65,
             "date": "2026-02-03",
             "feedback_text": (
-                "Elena's take-home submission was impressive. She built a well-architected Symfony 6 application "
-                "with hexagonal architecture. The domain layer was properly separated from infrastructure "
-                "concerns. Her use of value objects and custom Doctrine types showed maturity. Test coverage "
-                "was above 80% with a good mix of unit and integration tests. She even included a Makefile "
-                "and Docker setup for easy local development. One area for improvement: some of her service "
-                "classes were doing too much — could benefit from further decomposition. But this is a minor "
-                "point. Score: 4/5. Hire."
+                "Priya's take-home was impressive. She applied a hexagonal architecture with clear "
+                "separation between domain, application, and infrastructure layers. Her domain model "
+                "used value objects and custom types to enforce business rules. Test coverage was "
+                "above 80% with both unit and integration tests. She included a Docker setup and a "
+                "Makefile for local development — appreciated. One thing to flag: a few service "
+                "classes had accumulated too many responsibilities and could be split further. That "
+                "aside, the submission shows real architectural maturity. Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1006,
-            "interviewer": "Jakub Talacko",
-            "candidate": "Elena Svobodova",
-            "role": "PHP Developer",
+            "interviewer": "Jordan Chen",
+            "candidate": "Priya Sharma",
+            "role": "Backend Engineer",
             "decision": "strong_hire",
             "score": 5,
             "themes": ["communication", "culture_fit", "leadership"],
             "sentiment": 0.85,
             "date": "2026-02-07",
             "feedback_text": (
-                "Exceptional culture fit interview. Elena is articulate, collaborative, and clearly passionate "
-                "about clean engineering. She asked excellent questions about our team dynamics and development "
-                "process. She has experience mentoring junior developers and expressed enthusiasm about our "
-                "knowledge-sharing culture. Her communication style is clear and she adapts well — she "
-                "explained complex technical concepts in simple terms when I played the non-technical "
-                "stakeholder role. She'd be a great addition to our team both technically and culturally. "
-                "Score: 5/5. Strong hire."
+                "Exceptional culture fit conversation. Priya is articulate, thoughtful, and clearly "
+                "cares about the craft. She asked sharp questions about our team structure and "
+                "engineering practices. She has mentored junior engineers in previous roles and spoke "
+                "about it with real enthusiasm. Her communication adapts naturally — when I played a "
+                "non-technical stakeholder, she shifted her explanation style immediately. She'd "
+                "strengthen both the technical and cultural fabric of the team. Score: 5/5. Strong hire."
             ),
             "round_type": "Culture Fit",
         },
 
         # =====================================================================
-        # CANDIDATE 3: Petr Dvorak — Interviewers disagree completely
+        # CANDIDATE 3: Lucas Bennett — Interviewers disagree completely
         # =====================================================================
         {
             "id": 1007,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Petr Dvorak",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Lucas Bennett",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": -0.55,
             "date": "2026-01-22",
             "feedback_text": (
-                "Petr's technical depth is insufficient for our bar. He could not explain the difference "
-                "between hashing and encryption when asked directly — this is a basic security concept that "
-                "any mid-level developer should know. His understanding of git was limited to basic "
-                "commands; he didn't know what git rebase does or when you'd use it over merge. "
-                "When asked about database normalization, he struggled past 2NF. His PHP knowledge is "
-                "also shallow — he was unaware of named arguments, enums, or readonly properties introduced "
-                "in PHP 8.x. I cannot recommend hiring someone with these fundamental gaps. Score: 2/5."
+                "Lucas doesn't meet our technical bar. He couldn't explain the difference between "
+                "hashing and encryption — a basic security concept any mid-level engineer should know "
+                "cold. His version control knowledge was limited to daily commands; he didn't understand "
+                "what rebasing does or why you'd choose it over merging. On databases, he struggled "
+                "past basic normalization and couldn't speak to normal forms with any confidence. His "
+                "knowledge of modern language features was also shallow — unaware of named arguments, "
+                "enums, and other widely adopted features. These aren't advanced topics. The gaps are "
+                "too fundamental to overlook. Score: 2/5. No hire."
             ),
             "round_type": "Technical Quiz",
         },
         {
             "id": 1008,
-            "interviewer": "Tomas Horvath",
-            "candidate": "Petr Dvorak",
-            "role": "PHP Developer",
+            "interviewer": "Casey Walsh",
+            "candidate": "Lucas Bennett",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["problem_solving", "coding_ability", "communication"],
             "sentiment": 0.6,
             "date": "2026-01-20",
             "feedback_text": (
-                "I was impressed by Petr's problem-solving approach during the take-home review. His code "
-                "was pragmatic and well-organized. He used a clear MVC structure with proper separation of "
-                "concerns. The solution handled edge cases well and included meaningful error messages. "
-                "While the architecture wasn't as sophisticated as some submissions we see, the code was "
-                "clean, readable, and would be easy to maintain. He clearly understands the fundamentals "
-                "of building web applications. His communication during the walkthrough was clear and "
-                "he was receptive to feedback. Score: 4/5. Hire."
+                "I came away from the take-home review more positive than I expected. Lucas writes "
+                "practical, readable code. His MVC structure was clean and the separation of concerns "
+                "was clear. Edge cases were handled gracefully and his error messages were meaningful "
+                "rather than generic. The architecture wasn't the most sophisticated we see, but it was "
+                "coherent, maintainable, and delivered what was asked. He walked through his decisions "
+                "well during our debrief and was receptive when I challenged a couple of his choices. "
+                "Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1009,
-            "interviewer": "Jakub Talacko",
-            "candidate": "Petr Dvorak",
-            "role": "PHP Developer",
+            "interviewer": "Jordan Chen",
+            "candidate": "Lucas Bennett",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["culture_fit", "communication"],
             "sentiment": 0.7,
             "date": "2026-01-24",
             "feedback_text": (
-                "Really enjoyed talking to Petr. He has a great attitude and would fit well into our team. "
-                "He's curious, humble, and eager to learn. He talked about his experience transitioning "
-                "from a small agency to wanting to work at a product company, and his reasons were "
-                "thoughtful — he wants to own systems long-term rather than throw code over the wall. "
-                "He asked great questions about our engineering culture, code review process, and how we "
-                "handle technical debt. His collaborative mindset is exactly what we look for. "
-                "Score: 4/5. Hire."
+                "Genuinely enjoyed this conversation. Lucas has a great disposition — curious, low ego, "
+                "and eager to grow. He's coming from a small agency background and is specifically "
+                "looking for the kind of long-term product ownership that a company like ours offers. "
+                "His reasoning for the move felt authentic rather than rehearsed. He asked thoughtful "
+                "questions about our code review culture, how we handle legacy debt, and what growth "
+                "looks like for engineers here. His collaborative instincts are strong. Score: 4/5. Hire."
             ),
             "round_type": "Culture Fit",
         },
 
         # =====================================================================
-        # CANDIDATE 4: Lucie Nemcova — Database knowledge weakness pattern
+        # CANDIDATE 4: Sofia Andersen — Database knowledge weakness pattern
         # =====================================================================
         {
             "id": 1010,
-            "interviewer": "Michal Dobias",
-            "candidate": "Lucie Nemcova",
-            "role": "PHP Developer",
+            "interviewer": "Morgan Blake",
+            "candidate": "Sofia Andersen",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": 0.0,
             "date": "2025-12-12",
             "feedback_text": (
-                "Lucie has decent PHP fundamentals but her database knowledge is a significant gap. "
-                "She couldn't explain what a database index actually does at the storage level, and "
-                "when asked about query optimization she only mentioned 'adding more indexes.' "
-                "She was unaware of the N+1 problem in Doctrine ORM, which is critical for our "
-                "high-throughput warehouse systems. Her PHP skills are acceptable — she understands "
-                "OOP principles, interfaces, and basic design patterns. But for our workload where "
-                "database performance is crucial, I'm on the fence. Score: 3/5."
+                "Sofia has reasonable application-level fundamentals but a clear gap in database "
+                "knowledge. She couldn't explain what an index does at the storage level — just that "
+                "it speeds things up. When asked about query optimization she defaulted to 'add more "
+                "indexes' without considering write overhead or selectivity. She's also unfamiliar "
+                "with the N+1 query problem, which is a real concern given how query-intensive our "
+                "systems are. Her OOP knowledge is solid — she understands interfaces, abstract "
+                "classes, and common design patterns. On the fence. Score: 3/5."
             ),
             "round_type": "Technical Quiz",
         },
         {
             "id": 1011,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Lucie Nemcova",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Sofia Andersen",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["technical_skills", "system_design"],
             "sentiment": -0.45,
             "date": "2025-12-14",
             "feedback_text": (
-                "Technical interview confirmed the database weakness flagged in the quiz round. When I "
-                "asked Lucie to design a schema for our inventory tracking system, she created a single "
-                "monolithic table with no consideration for normalization or query patterns. She couldn't "
-                "explain the difference between a clustered and non-clustered index. Her Doctrine knowledge "
-                "is limited to basic CRUD operations — she hasn't worked with DQL, query builder optimization, "
-                "or second-level cache. She also struggled with the system design portion, unable to "
-                "articulate how she'd handle concurrent inventory updates. Not ready for our level. "
-                "Score: 2/5. No hire."
+                "The technical interview confirmed what the quiz round flagged. When I asked Sofia to "
+                "design a schema for an inventory tracking system, she produced a flat, denormalized "
+                "structure with no consideration for query access patterns or concurrent writes. She "
+                "couldn't articulate the difference between clustered and secondary indexes. Her ORM "
+                "usage is limited to basic CRUD — she hasn't worked with query builder optimization, "
+                "custom query languages, or second-level caching. The system design portion exposed "
+                "further gaps: she had no strategy for handling concurrent inventory updates. "
+                "Not at the level we need. Score: 2/5. No hire."
             ),
             "round_type": "Technical Interview",
         },
 
         # =====================================================================
-        # CANDIDATE 5: Tomas Novak — Solid but unspectacular
+        # CANDIDATE 5: Ethan Cole — Solid but unspectacular
         # =====================================================================
         {
             "id": 1012,
-            "interviewer": "Matej Smisek",
-            "candidate": "Tomas Novak",
-            "role": "PHP Developer",
+            "interviewer": "Sam Rivera",
+            "candidate": "Ethan Cole",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": 0.55,
             "date": "2026-02-18",
             "feedback_text": (
-                "Tomas delivered a well-executed take-home. His Symfony application was cleanly structured "
-                "with proper use of services, repositories, and DTOs. He implemented request validation "
-                "using Symfony's validator component correctly. His API responses followed a consistent "
-                "format with proper pagination. Test coverage was around 70% — decent but could be higher. "
-                "Code quality was good overall, with clear naming conventions and appropriate use of "
-                "type hints throughout. Nothing groundbreaking but solid, reliable work. Score: 4/5. Hire."
+                "Ethan delivered a well-executed take-home. His application was cleanly structured with "
+                "thin controllers, a proper service layer, and repository abstractions. He used the "
+                "framework's validation component correctly and his API responses were consistent with "
+                "sensible pagination. Test coverage was around 70% — acceptable but I'd want to see "
+                "higher. Code quality was good throughout: clear naming, appropriate use of type hints, "
+                "no obvious code smells. Not groundbreaking, but solid and dependable. Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1013,
-            "interviewer": "Ondrej Netik",
-            "candidate": "Tomas Novak",
-            "role": "PHP Developer",
+            "interviewer": "Taylor Kim",
+            "candidate": "Ethan Cole",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 3,
             "themes": ["technical_skills", "problem_solving"],
             "sentiment": 0.35,
             "date": "2026-02-20",
             "feedback_text": (
-                "Technical quiz went reasonably well. Tomas correctly explained the difference between "
-                "hashing and encryption, gave a solid answer on git rebase vs merge workflows, and "
-                "showed adequate understanding of database indexes. His PHP knowledge is current — he's "
-                "familiar with PHP 8.2 features. His Doctrine knowledge is practical but not deep. "
-                "He had some gaps around more advanced topics like event listeners, custom Doctrine "
-                "types, and cache regions. Overall, he meets the bar but doesn't exceed it. Score: 3/5. Hire."
+                "Technical quiz was reasonable. Ethan correctly explained hashing vs encryption, gave "
+                "a clear answer on rebasing vs merging, and showed adequate database index knowledge. "
+                "His understanding of modern language features is current. His ORM knowledge is "
+                "practical but not deep — he's familiar with the basics but hasn't gone far into "
+                "event listeners, custom types, or cache regions. He meets the bar without clearing it "
+                "by much. Score: 3/5. Hire."
             ),
             "round_type": "Technical Quiz",
         },
 
         # =====================================================================
-        # CANDIDATE 6: Anna Prochazkova — Strong but fails culture fit
+        # CANDIDATE 6: Claire Okafor — Strong but fails culture fit
         # =====================================================================
         {
             "id": 1014,
-            "interviewer": "Michal Dobias",
-            "candidate": "Anna Prochazkova",
-            "role": "PHP Developer",
+            "interviewer": "Morgan Blake",
+            "candidate": "Claire Okafor",
+            "role": "Backend Engineer",
             "decision": "strong_hire",
             "score": 5,
             "themes": ["technical_skills", "system_design", "coding_ability"],
             "sentiment": 0.8,
             "date": "2026-03-02",
             "feedback_text": (
-                "Anna is technically brilliant. Her take-home was the best I've reviewed this quarter — "
-                "clean DDD architecture with proper bounded contexts, event sourcing for the order flow, "
-                "and comprehensive test suite including contract tests. She used PHP 8.3 features "
-                "elegantly including typed class constants and the json_validate function. Her Doctrine "
-                "setup was optimal with proper lazy loading strategies and custom repository methods. "
-                "This is senior-level work. Score: 5/5. Strong hire."
+                "Claire's take-home was the strongest submission I've reviewed this cycle. She applied "
+                "a full DDD approach with proper bounded contexts, used event sourcing for the order "
+                "flow, and wrote a comprehensive test suite including contract tests. She leveraged "
+                "modern language features elegantly and her ORM configuration was optimized with "
+                "explicit loading strategies and custom repository methods. This is senior-level work "
+                "by any measure. Score: 5/5. Strong hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1015,
-            "interviewer": "Jakub Talacko",
-            "candidate": "Anna Prochazkova",
-            "role": "PHP Developer",
+            "interviewer": "Jordan Chen",
+            "candidate": "Claire Okafor",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["culture_fit", "communication"],
             "sentiment": -0.4,
             "date": "2026-03-04",
             "feedback_text": (
-                "Despite Anna's obvious technical talent, I have serious concerns about culture fit. "
-                "She was dismissive of our pair programming practice, calling it 'a waste of time for "
-                "senior engineers.' When I described our collaborative code review process, she said "
-                "she prefers to 'just get things done' without 'committee approval.' She was also "
-                "critical of our tech stack choices without understanding the context behind them. "
-                "Her communication style was blunt to the point of being abrasive. In a team environment "
-                "like ours, attitude matters as much as technical skill. Score: 2/5. No hire."
+                "I have serious concerns about team fit despite Claire's technical background. She was "
+                "dismissive of pair programming, calling it inefficient for experienced engineers. "
+                "When I described our collaborative code review process, she pushed back — said she'd "
+                "rather ship than get stuck in 'design by committee.' Her attitude toward our stack was "
+                "critical and lacking in curiosity about the constraints behind our choices. Her "
+                "communication style was poor — blunt to the point of being off-putting rather than "
+                "constructively direct. These are not gaps we can mentor around. Technical skill alone "
+                "is insufficient in a team-first environment like ours. Score: 2/5. No hire."
             ),
             "round_type": "Culture Fit",
         },
 
         # =====================================================================
-        # CANDIDATE 7: David Horak — Database weakness pattern
+        # CANDIDATE 7: Marcus Webb — Database weakness pattern
         # =====================================================================
         {
             "id": 1016,
-            "interviewer": "Tomas Horvath",
-            "candidate": "David Horak",
-            "role": "PHP Developer",
+            "interviewer": "Casey Walsh",
+            "candidate": "Marcus Webb",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": 0.1,
             "date": "2025-12-20",
             "feedback_text": (
-                "David's technical quiz showed a mixed picture. He's comfortable with PHP fundamentals "
-                "and has decent Symfony experience. He correctly explained dependency injection and "
-                "service containers. However, his database knowledge is weak — he confused foreign keys "
-                "with indexes, and couldn't explain when you'd use a LEFT JOIN vs INNER JOIN in a "
-                "practical scenario. His git knowledge was basic but functional. He understood "
-                "hashing vs encryption at a high level but lacked depth. He has potential but would "
-                "need significant mentoring on the database side. Score: 3/5. On the fence."
+                "Mixed picture from the technical quiz. Marcus is comfortable with framework basics and "
+                "has decent service container knowledge. He correctly explained dependency injection. "
+                "However, his database knowledge is weak — he mixed up foreign keys and indexes at one "
+                "point, and couldn't give a practical explanation of when to prefer a left join over "
+                "an inner join. His version control knowledge is functional for day-to-day work. "
+                "He has potential but would need real investment on the data layer side. "
+                "Score: 3/5. On the fence."
             ),
             "round_type": "Technical Quiz",
         },
         {
             "id": 1017,
-            "interviewer": "Jan Nedbal",
-            "candidate": "David Horak",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Marcus Webb",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["technical_skills", "system_design"],
             "sentiment": -0.5,
             "date": "2025-12-22",
             "feedback_text": (
-                "David's technical interview exposed critical gaps. His understanding of SQL query "
-                "optimization is insufficient — he didn't know what EXPLAIN does and couldn't describe "
-                "how a B-tree index works. When asked to design a warehouse inventory system, his "
-                "schema had obvious normalization issues and no consideration for concurrent access. "
-                "His Doctrine knowledge is limited to auto-generated CRUD. He hasn't worked with "
-                "migrations beyond the basics and was unaware of Doctrine events. For our "
-                "performance-critical systems, this level of database knowledge is inadequate. "
-                "Score: 2/5. No hire."
+                "Technical interview exposed critical gaps in Marcus's database knowledge. He didn't "
+                "know what EXPLAIN does or how a B-tree index is structured. When I asked him to design "
+                "a warehouse inventory schema, it had obvious normalization issues and no handling for "
+                "concurrent access patterns. His ORM usage appears limited to scaffolded CRUD — he "
+                "hasn't worked with migrations beyond the basics and was unfamiliar with ORM event "
+                "hooks. For systems where query performance is a first-class concern, this level of "
+                "knowledge is insufficient. Score: 2/5. No hire."
             ),
             "round_type": "Technical Interview",
         },
 
         # =====================================================================
-        # CANDIDATE 8: Katerina Mala — Junior but promising
+        # CANDIDATE 8: Zoe Patel — Junior but promising
         # =====================================================================
         {
             "id": 1018,
-            "interviewer": "Matej Smisek",
-            "candidate": "Katerina Mala",
-            "role": "PHP Developer",
+            "interviewer": "Sam Rivera",
+            "candidate": "Zoe Patel",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["coding_ability", "technical_skills"],
             "sentiment": 0.2,
             "date": "2026-02-25",
             "feedback_text": (
-                "Katerina's take-home showed potential but also revealed her junior level. The code "
-                "was functional and well-organized, but lacked the architectural sophistication we "
-                "look for. She used a basic MVC approach without service layer abstraction. Her tests "
-                "were present but only covered happy paths. On the positive side, her code was clean, "
-                "properly formatted, and she used type hints consistently. She clearly has good habits "
-                "and a solid foundation to build on. The question is whether we're hiring for current "
-                "ability or potential. Score: 3/5. Lean hire if we have bandwidth for mentoring."
+                "Zoe's take-home showed potential alongside clear signs of her experience level. The "
+                "code is functional and organized, but the architecture is fairly flat — no real service "
+                "layer abstraction and no interface usage. Tests only covered happy paths. On the "
+                "positive side: the code is clean, formatting is consistent, and type hints are used "
+                "throughout. She has good foundational habits. Whether we hire depends on whether "
+                "we're staffing for current output or growth trajectory. Score: 3/5. Lean hire if "
+                "there's bandwidth for mentoring."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1019,
-            "interviewer": "Tomas Horvath",
-            "candidate": "Katerina Mala",
-            "role": "PHP Developer",
+            "interviewer": "Casey Walsh",
+            "candidate": "Zoe Patel",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 3,
             "themes": ["problem_solving", "communication", "culture_fit"],
             "sentiment": 0.4,
             "date": "2026-02-27",
             "feedback_text": (
-                "Katerina's technical quiz revealed expected gaps for her experience level, but her "
-                "approach to problems she didn't know was impressive. She was honest about what she "
-                "didn't know, asked clarifying questions, and reasoned through problems logically. "
-                "She correctly explained PHP arrays as ordered hash maps and knew the difference "
-                "between == and ===. Her git knowledge was basic but she showed willingness to learn. "
-                "Database knowledge is limited but she understood the concept of indexing even if "
-                "she couldn't go deep. I think with 3-6 months of mentoring she'd be valuable. "
-                "Score: 3/5. Hire — she has the right mindset."
+                "Zoe's quiz results were mixed for her experience level, but her approach to questions "
+                "she didn't know stood out. She was upfront about knowledge gaps, asked clarifying "
+                "questions before guessing, and reasoned through problems logically. She correctly "
+                "explained the semantics of loose vs strict equality comparisons and understood the "
+                "indexing concept conceptually even if she couldn't go deep. Her version control "
+                "knowledge is basic but she was curious and engaged. With a few months of mentoring "
+                "she'd be valuable. Score: 3/5. Hire — right mindset."
             ),
             "round_type": "Technical Quiz",
         },
 
         # =====================================================================
-        # CANDIDATE 9: Jiri Bartos — Consistently mediocre
+        # CANDIDATE 9: Owen Marsh — Consistently mediocre
         # =====================================================================
         {
             "id": 1020,
-            "interviewer": "Michal Dobias",
-            "candidate": "Jiri Bartos",
-            "role": "PHP Developer",
+            "interviewer": "Morgan Blake",
+            "candidate": "Owen Marsh",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": -0.1,
             "date": "2026-01-08",
             "feedback_text": (
-                "Jiri's take-home was average. The code works but lacks polish. He used procedural "
-                "style in several places where OOP would be more appropriate. No tests were included, "
-                "which is a red flag. His Symfony usage was basic — he didn't leverage the framework's "
-                "strengths like form handling, event dispatchers, or the security component. Database "
-                "queries were written as raw SQL instead of using Doctrine's query builder. The code "
-                "would work in production but wouldn't be enjoyable to maintain. Score: 3/5. Borderline."
+                "Owen's take-home was average. The application works but lacks polish. Several sections "
+                "used a procedural style where OOP would have been more appropriate. No tests were "
+                "included, which is a red flag for us. His framework usage was shallow — he didn't "
+                "leverage built-in components for things like async dispatch or form validation. "
+                "Database queries were written as raw strings rather than using the query builder. "
+                "The code would run in production but maintaining it would be unpleasant. "
+                "Score: 3/5. Borderline."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1021,
-            "interviewer": "Ondrej Netik",
-            "candidate": "Jiri Bartos",
-            "role": "PHP Developer",
+            "interviewer": "Taylor Kim",
+            "candidate": "Owen Marsh",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "problem_solving"],
             "sentiment": 0.0,
             "date": "2026-01-10",
             "feedback_text": (
-                "Technical quiz was underwhelming. Jiri gave surface-level answers to most questions. "
-                "He knows the difference between hashing and encryption but couldn't name specific "
-                "algorithms or when you'd use each. His git knowledge covers daily workflows but not "
-                "more advanced operations like interactive rebase or bisect. Database index explanation "
-                "was limited to 'they speed up queries.' He's been working with PHP for 5 years but "
-                "his knowledge feels more like 1-2 years of depth. No clear strengths or weaknesses — "
-                "just consistently below our bar across the board. Score: 3/5. Undecided."
+                "Technical quiz was underwhelming. Owen gave surface-level answers across the board. "
+                "He knows the conceptual difference between hashing and encryption but couldn't name "
+                "common algorithms or reason through when you'd use each. His version control knowledge "
+                "covers daily workflows but not more advanced operations. Database knowledge was "
+                "reduced to 'indexes speed things up.' He's been in the industry several years but "
+                "his depth feels much more shallow than his tenure would suggest. No strong areas, "
+                "no strong weaknesses — just consistently below our bar. Score: 3/5. Undecided."
             ),
             "round_type": "Technical Quiz",
         },
 
         # =====================================================================
-        # CANDIDATE 10: Radek Vlcek — Good but database weakness
+        # CANDIDATE 10: Dylan Torres — Good but database weakness
         # =====================================================================
         {
             "id": 1022,
-            "interviewer": "Matej Smisek",
-            "candidate": "Radek Vlcek",
-            "role": "PHP Developer",
+            "interviewer": "Sam Rivera",
+            "candidate": "Dylan Torres",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["coding_ability", "technical_skills"],
             "sentiment": 0.5,
             "date": "2026-03-10",
             "feedback_text": (
-                "Radek's take-home was well-crafted. Good use of Symfony's messenger component for "
-                "async processing, clean controller layer with thin controllers delegating to services. "
-                "His code was readable with meaningful variable names and helpful docblocks where needed. "
-                "He implemented a proper command/query separation pattern. Test coverage included both "
-                "unit tests with mocks and functional tests for API endpoints. One concern: his database "
-                "migration had some inefficient column types and missing indexes on frequently queried "
-                "columns. Overall a strong submission. Score: 4/5. Hire."
+                "Dylan's take-home was well crafted. He used an async messaging pattern for background "
+                "processing, kept controllers thin, and pushed logic into properly scoped services. "
+                "Variable naming was clear and he added docblocks where they added value. He implemented "
+                "command/query separation cleanly. Test coverage included unit tests with mocks and "
+                "functional tests for the API. One concern: his database migration had inefficient "
+                "column types and was missing indexes on columns that will clearly be queried heavily. "
+                "Overall a strong submission. Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1023,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Radek Vlcek",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Dylan Torres",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "system_design"],
             "sentiment": -0.15,
             "date": "2026-03-12",
             "feedback_text": (
-                "Radek showed strong application-level skills but his database and infrastructure "
-                "knowledge needs work. He understood Doctrine's lazy loading and the N+1 problem, "
-                "which is good. But when I pressed on index internals, query plan optimization, and "
-                "database replication strategies, he reached his limits quickly. His system design "
-                "answer for the order fulfillment pipeline was decent but lacked consideration for "
-                "data consistency in distributed scenarios. He's a solid developer who could grow "
-                "into the role but isn't there yet on the infrastructure side. Score: 3/5. Lean hire "
-                "with mentoring plan."
+                "Dylan is capable at the application layer but struggled when we moved into database "
+                "and infrastructure topics. He understood lazy loading and the N+1 problem, which is "
+                "good. But when I pushed on index internals, query plan analysis, and replication "
+                "strategies, the gaps became clear quickly. His system design answer for a fulfillment "
+                "pipeline was adequate at the service level but didn't account for data consistency "
+                "across distributed writes — a concerning miss for this role. He's a developer who "
+                "could grow into it, but isn't there yet. Score: 3/5. Lean hire with a mentoring plan."
             ),
             "round_type": "Technical Interview",
         },
 
         # =====================================================================
-        # CANDIDATE 11: Marketa Hajkova — Great candidate, quick process
+        # CANDIDATE 11: Nina Castillo — Great candidate, quick process
         # =====================================================================
         {
             "id": 1024,
-            "interviewer": "Ondrej Netik",
-            "candidate": "Marketa Hajkova",
-            "role": "PHP Developer",
+            "interviewer": "Taylor Kim",
+            "candidate": "Nina Castillo",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["technical_skills", "problem_solving", "coding_ability"],
             "sentiment": 0.6,
             "date": "2026-03-05",
             "feedback_text": (
-                "Marketa demonstrated solid technical skills in the quiz round. She confidently explained "
-                "hashing vs encryption with real-world examples (bcrypt for passwords, AES for data at rest). "
-                "Her git knowledge was thorough — she explained rebase vs merge with clear diagrams and "
-                "when each is appropriate. Database indexes were explained well including composite indexes "
-                "and covering indexes. She's currently using Doctrine with Symfony and demonstrated good "
-                "understanding of entity lifecycle, DQL, and performance optimization. Her PHP knowledge "
-                "is up to date with 8.2 features. Score: 4/5. Hire."
+                "Nina was confident and precise throughout the quiz. She explained hashing vs encryption "
+                "with concrete examples — password storage, data-at-rest encryption — without needing "
+                "prompting. Her version control knowledge was thorough; she drew out rebase vs merge "
+                "history clearly and articulated when each is the right call. Database indexes came "
+                "with a solid explanation of composite indexes and covering indexes. She's working with "
+                "an ORM daily and demonstrated fluent understanding of entity lifecycle and performance "
+                "optimization. Her knowledge of recent language features is current. Score: 4/5. Hire."
             ),
             "round_type": "Technical Quiz",
         },
         {
             "id": 1025,
-            "interviewer": "Michal Dobias",
-            "candidate": "Marketa Hajkova",
-            "role": "PHP Developer",
+            "interviewer": "Morgan Blake",
+            "candidate": "Nina Castillo",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["coding_ability", "technical_skills"],
             "sentiment": 0.55,
             "date": "2026-03-07",
             "feedback_text": (
-                "Strong take-home from Marketa. She built a clean REST API with Symfony 6.4, "
-                "implementing CQRS-lite pattern with separate read and write models. Her test suite "
-                "was comprehensive with factories for test data generation. She used PHP enums for "
-                "status fields and readonly DTOs for data transfer — modern patterns applied correctly. "
-                "The Docker setup was production-ready with multi-stage builds. Her database schema "
-                "was well-designed with appropriate indexes and foreign key constraints. Minor note: "
-                "some of the event handlers could be more focused. Score: 4/5. Hire."
+                "Strong take-home from Nina. She implemented a CQRS-lite pattern with cleanly separated "
+                "read and write models. Her test suite was comprehensive with factory helpers for "
+                "generating test fixtures. She used enums for status fields and readonly value objects "
+                "for data transfer — modern patterns applied correctly, not just cargo-culted. Docker "
+                "setup was production-ready with multi-stage builds. Database schema was well thought "
+                "through with appropriate indexes and proper foreign key constraints. Minor note: some "
+                "event handlers were doing too much. Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": 1026,
-            "interviewer": "Jakub Talacko",
-            "candidate": "Marketa Hajkova",
-            "role": "PHP Developer",
+            "interviewer": "Jordan Chen",
+            "candidate": "Nina Castillo",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["culture_fit", "communication", "leadership"],
             "sentiment": 0.65,
             "date": "2026-03-09",
             "feedback_text": (
-                "Marketa was a pleasure to interview. She has experience working in agile teams and "
-                "is comfortable with code reviews, sprint planning, and retrospectives. She asked "
-                "insightful questions about our deployment pipeline and how we handle on-call rotations. "
-                "She has experience mentoring junior developers at her current company and enjoys it. "
-                "Her communication is clear and she listens actively. She expressed genuine excitement "
-                "about ShipMonk's scale challenges. One thing I noticed is she's collaborative but also "
-                "confident enough to push back on ideas — a great balance. Score: 4/5. Hire."
+                "Nina was a pleasure to talk with. She has strong agile experience and is comfortable "
+                "with code reviews, sprint rituals, and retrospectives. She asked sharp questions about "
+                "our deployment pipeline and on-call setup. She's mentored junior engineers at her "
+                "current company and clearly enjoys it. Her communication is clear and she listens "
+                "well. She expressed genuine interest in the scale challenges we're solving. One thing "
+                "I noticed: she's collaborative but also confident enough to advocate for her positions "
+                "when challenged — a healthy balance. Score: 4/5. Hire."
             ),
             "round_type": "Culture Fit",
         },
@@ -607,49 +609,50 @@ def get_mock_greenhouse_data():
         # Additional entries to flesh out interviewer patterns
         # =====================================================================
 
-        # Jan Nedbal being consistently tough (another no_hire)
+        # Alex Mercer being consistently tough (another no_hire)
         {
             "id": 1027,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Filip Cerny",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Jake Harmon",
+            "role": "Backend Engineer",
             "decision": "no_hire",
             "score": 2,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": -0.65,
             "date": "2025-12-08",
             "feedback_text": (
-                "Filip's technical interview was below expectations. His understanding of PHP internals "
-                "is shallow — he couldn't explain how PHP handles memory management or what OPcache does. "
-                "When asked about Doctrine's identity map and unit of work patterns, he had no idea what "
-                "I was talking about. His database knowledge is inadequate: he couldn't explain transaction "
-                "isolation levels or what ACID stands for. His code during the live exercise was poorly "
-                "structured with no separation of concerns. Even basic concepts like interface segregation "
-                "principle were foreign to him. He's been writing PHP for 3 years but his depth is "
-                "concerning. Score: 2/5. Reject."
+                "Jake's technical interview was below the bar. He couldn't explain how the runtime "
+                "manages memory or what bytecode caching does — these are things an engineer with "
+                "several years of experience should have encountered. He had no familiarity with ORM "
+                "internals like the identity map or unit of work pattern. Database knowledge was "
+                "inadequate: he didn't know what transaction isolation levels are or what ACID "
+                "guarantees mean in practice. His live coding produced loosely structured code with "
+                "no separation of concerns. Even foundational design principles like interface "
+                "segregation were unfamiliar to him. The experience on his CV doesn't match the "
+                "depth in this interview. Score: 2/5. Reject."
             ),
             "round_type": "Technical Interview",
         },
 
-        # Tomas Horvath being more lenient
+        # Casey Walsh being more lenient
         {
             "id": 1028,
-            "interviewer": "Tomas Horvath",
-            "candidate": "Filip Cerny",
-            "role": "PHP Developer",
+            "interviewer": "Casey Walsh",
+            "candidate": "Jake Harmon",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["coding_ability", "problem_solving"],
             "sentiment": 0.15,
             "date": "2025-12-06",
             "feedback_text": (
-                "Filip's take-home was acceptable. The code worked and handled the main requirements. "
-                "His approach was straightforward — not the most elegant solution but functional. "
-                "He used some Symfony components correctly and his controller structure was reasonable. "
-                "No tests, which I flagged, but the code itself was clean enough to be testable. "
-                "His README explained the setup process clearly. I think he has potential but needs "
-                "to develop more depth. With the right mentoring environment, he could grow. "
-                "Score: 3/5. Maybe — depends on team capacity for mentoring."
+                "Jake's take-home was passable. The code delivered on the requirements and the "
+                "overall structure was easy to follow. He used the framework's routing and some "
+                "built-in components correctly. The approach was straightforward and coherent if "
+                "unremarkable. No tests included, which I flagged — though the code was structured "
+                "in a way that would make it testable. His README covered setup clearly. I think he "
+                "has potential and might respond well to a solid mentoring environment. "
+                "Score: 3/5. Maybe — depends on team capacity."
             ),
             "round_type": "Take-home Review",
         },
@@ -753,7 +756,7 @@ def get_mock_greenhouse_payload(entries=None, id_offset=0):
             "id": candidate_id,
             "first_name": first_name,
             "last_name": last_name or "",
-            "company": "ShipMonk CZ Tech",
+            "company": "Nexora Logistics",
             "title": base["role"],
             "created_at": f"{base['date']}T09:00:00Z",
             "updated_at": f"{base['date']}T12:00:00Z",
@@ -792,35 +795,35 @@ def get_mock_greenhouse_sync_payload():
     sync_entries = [
         {
             "id": None,
-            "interviewer": "Matej Smisek",
-            "candidate": "Vojtech Kral",
-            "role": "PHP Developer",
+            "interviewer": "Sam Rivera",
+            "candidate": "Leo Grant",
+            "role": "Backend Engineer",
             "decision": "hire",
             "score": 4,
             "themes": ["technical_skills", "coding_ability"],
             "sentiment": 0.5,
             "date": "2026-03-19",
             "feedback_text": (
-                "Vojtech showed solid understanding of Symfony's service container and dependency injection. "
-                "His take-home used a proper repository pattern with Doctrine. Code was clean with good "
-                "test coverage. Score: 4/5. Hire."
+                "Leo demonstrated solid understanding of service containers and dependency injection. "
+                "His take-home used a clean repository pattern with proper ORM integration. Code was "
+                "readable with good test coverage. Score: 4/5. Hire."
             ),
             "round_type": "Take-home Review",
         },
         {
             "id": None,
-            "interviewer": "Jan Nedbal",
-            "candidate": "Vojtech Kral",
-            "role": "PHP Developer",
+            "interviewer": "Alex Mercer",
+            "candidate": "Leo Grant",
+            "role": "Backend Engineer",
             "decision": "maybe",
             "score": 3,
             "themes": ["technical_skills", "system_design"],
             "sentiment": 0.05,
             "date": "2026-03-19",
             "feedback_text": (
-                "Vojtech's technical interview was mixed. Strong on application-level PHP patterns but "
-                "struggled with database performance optimization questions. His understanding of Doctrine's "
-                "unit of work was surface-level. Needs more depth on infrastructure topics. Score: 3/5."
+                "Leo's technical interview was mixed. Strong on application-level patterns but "
+                "struggled with database performance optimization. His understanding of ORM internals "
+                "was surface-level. Needs more depth on infrastructure topics. Score: 3/5."
             ),
             "round_type": "Technical Interview",
         },
